@@ -1,0 +1,254 @@
+.credit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.credit-form-fields {
+  display: flex;
+  gap: 12px;
+  flex-wrap: nowrap;
+}
+
+
+.credit-form button {
+  background: linear-gradient(135deg, #42e695, #3bb2b8);
+  color: white;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  width: 220px;
+  align-self: flex-start;
+}
+
+.credit-form button:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.credit-form input,
+.credit-form select {
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255,255,255,0.4);
+  background: rgba(255,255,255,0.2);
+  color: white;
+  min-width: 160px;
+  outline: none;
+}
+
+.credit-form input::placeholder {
+  color: rgba(255,255,255,0.7);
+}
+
+.credit-form input:focus,
+.credit-form select:focus {
+  border-color: white;
+}
+
+.credit-form select {
+  background: rgba(255,255,255,0.2);
+  color: white;
+}
+
+.credit-form select option {
+  background: rgba(40,40,40,0.9);
+  color: white;
+}
+
+.credit-message {
+  margin-top: 8px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.credit-error {
+  color: #ff6b6b;
+}
+
+.credit-success {
+  color: #7bed9f;
+}
+
+.credits-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+  width: 220px;
+}
+
+.credit-toggle-btn {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  font-weight: 700;
+  border-radius: 8px;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.credit-toggle-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+.loan-cell button,
+.details-btn {
+  background: linear-gradient(135deg, #42a1f5, #2575fc);
+  color: white;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 6px 12px;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.15s ease, filter 0.15s ease;
+}
+
+.loan-cell button:hover,
+.details-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.loan-grid-wrapper {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 6px;
+  margin-top: 20px;
+
+  background: rgba(255,255,255,0.1);
+  padding: 12px;
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+}
+
+.loan-row {
+  display: contents;
+}
+
+.loan-cell {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(255,255,255,0.15);
+  padding: 8px;
+  border-radius: 6px;
+  font-size: 14px;
+  color: white;
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.loan-cell-header {
+  background: rgba(255,255,255,0.3);
+  font-weight: 700;
+}
+
+.loan-row:nth-child(odd) .loan-cell {
+  background: rgba(255,255,255,0.18);
+}
+
+.loan-row:nth-child(even) .loan-cell {
+  background: rgba(255,255,255,0.12);
+}
+
+.loan-row:hover .loan-cell {
+  background: rgba(255,255,255,0.28);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  width: 90%;
+  max-width: 520px;
+  max-height: 80%;
+  overflow-y: auto;
+
+  background: rgba(255,255,255,0.15);
+  backdrop-filter: blur(12px);
+  color: white;
+
+  padding: 24px;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.35);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.modal-close-btn {
+  background: rgba(255,255,255,0.25);
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255,255,255,0.35);
+}
+
+.modal-content .loan-name {
+  font-weight: 800;
+  font-size: 1.2rem;
+  margin-bottom: 12px;
+  color: #fff;
+  text-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
+
+.payment-list {
+  margin-top: 10px;
+}
+
+.payment-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.2);
+  font-family: monospace;
+}
+
+.payment-date,
+.payment-type {
+  flex: 1;
+  text-align: left;
+}
+
+.payment-amount {
+  flex: 1;
+  display: flex;
+  gap: 4px;
+}
+
+.amount-value {
+  min-width: 60px;
+  text-align: right;
+}
+
+.amount-currency {
+  text-align: left;
+}
