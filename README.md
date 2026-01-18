@@ -176,9 +176,33 @@ docker-compose down
 
 ---
 
-## Future Features
+## Features
 
-*(Add planned features here)*
+### Current Features
+- **User Management**
+  - User registration and authentication
+  - Secure login with JWT tokens
+
+- **Loan Management**
+  - Add and track multiple loans
+  - Record loan installments and overpayments
+  - Monitor loan repayment progress
+
+### Planned Features
+- **Vehicle Maintenance**
+  - Service history tracking
+  - Inspection reminders
+  - Insurance (OC) management 
+
+- **Household Finances**
+  - Income and expense tracking
+  - Budget planning and monitoring
+  - Financial reports and analytics
+
+- **Meal Planning**
+  - Weekly meal scheduler
+  - Shopping list generation
+  - Recipe management
 
 ---
 
