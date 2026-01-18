@@ -18,11 +18,15 @@ function AddInstallmentForm({ onSuccess }) {
     setLoading(true);
     setError(null);
     try {
-      const data = await getLoanStatus(user.user_id);
-      setLoans(data || []);
+      const response = await getLoanStatus(user.user_id);
+      
+      if (!response.ok) {
+        throw new Error(response.data?.detail || 'Błąd pobierania kredytów');
+      }
+      
+      setLoans(response.data || []);
     } catch (err) {
-      if (err.message.includes('No loans')) setLoans([]);
-      else setError(err.message);
+      setError(err.message);
     } finally {
       setLoading(false);
     }

@@ -17,6 +17,7 @@ async def init_db():
                 l.total_amount,
                 l.installments_count,
                 l.installment_amount,
+                l.due_day, 
                 COALESCE(SUM(p.amount), 0) AS total_paid,
                 l.total_amount - COALESCE(SUM(p.amount), 0) AS remaining,
                 COALESCE(

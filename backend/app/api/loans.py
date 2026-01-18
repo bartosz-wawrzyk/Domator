@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.deps import get_db, get_current_user
 from app.db.repositories.loans import LoanRepository
-from app.db.models.loans import Loan, LoanCreate
+from app.db.models.loans import Loan, LoanCreate, LoanUpdate
 from datetime import datetime
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import text
@@ -30,6 +30,29 @@ async def create_loan(
     loan = await LoanRepository.create(db, loan)
     return {"message": "Loan created successfully", "loan_id": loan.id}
 
+@router.delete("/{loan_id}", status_code=status.HTTP_200_OK)
+async def delete_loan(
+    loan_id: uuid.UUID,
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    loan = await LoanRepository.get_by_id(db, loan_id, current_user.id)
+    if not loan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Loan not found"
+        )
+    
+    if await LoanRepository.has_payments(db, loan_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Cannot delete loan with existing payments (installments or prepayments)"
+        )
+
+    await LoanRepository.delete(db, loan)
+    
+    return {"message": "Loan deleted successfully"}
+
 @router.get("/loan_status/{user_id}", response_model=None)
 async def get_user_loan_status(user_id: uuid.UUID, db: AsyncSession = Depends(get_db), current_user=Depends(get_current_user)):
     result = await db.execute(
@@ -40,3 +63,32 @@ async def get_user_loan_status(user_id: uuid.UUID, db: AsyncSession = Depends(ge
     if not rows:
         raise HTTPException(status_code=404, detail="No loans found for this user")
     return rows
+
+@router.patch("/{loan_id}", status_code=status.HTTP_200_OK)
+async def update_loan(
+    loan_id: uuid.UUID,
+    data: LoanUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    loan = await LoanRepository.get_by_id(db, loan_id, current_user.id)
+    if not loan:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Loan not found"
+        )
+    
+    update_data = data.model_dump(exclude_unset=True)
+    
+    if not update_data:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No fields to update"
+        )
+    
+    updated_loan = await LoanRepository.update(db, loan, update_data)
+    
+    return {
+        "message": "Loan updated successfully",
+        "loan_id": updated_loan.id
+    }

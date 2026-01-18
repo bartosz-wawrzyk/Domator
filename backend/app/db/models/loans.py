@@ -26,3 +26,10 @@ class LoanCreate(BaseModel):
     installments_count: int = Field(..., gt=0)
     due_day: int = Field(..., ge=1, le=31)
     installment_amount: float = Field(..., gt=0)
+
+class LoanUpdate(BaseModel):
+    name: str | None = Field(None, max_length=255)
+    total_amount: float | None = Field(None, gt=0)
+    installments_count: int | None = Field(None, gt=0)
+    due_day: int | None = Field(None, ge=1, le=31)
+    installment_amount: float | None = Field(None, gt=0)

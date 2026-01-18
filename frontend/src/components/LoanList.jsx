@@ -1,39 +1,82 @@
 import { useEffect, useState, useContext } from 'react';
 import { AuthContext } from '../context/AuthContext';
-import { getLoanStatus, getLoanPayments } from '../api/loans';
+import { getLoanStatus, getLoanPayments, deleteLoan, deletePayment } from '../api/loans';
+import EditButton from '../components/EditButton';
+import DeleteButton from '../components/DeleteButton';
+import LoanEditModal from '../components/LoanEditModal';
+import PaymentEditModal from '../components/PaymentEditModal';
 import '../assets/styles/credit.css';
 
-function PaymentModal({ payments, loanName, onClose }) {
-  return (
-    <div className="modal-backdrop" onClick={onClose}>
-      <div className="modal-content" onClick={e => e.stopPropagation()}>
-        <div className="modal-header">
-          <div className="loan-name">{loanName}</div>
-          <button className="modal-close-btn" onClick={onClose}>
-            Zamknij
-          </button>
-        </div>
+function PaymentModal({ payments, loanName, onClose, onPaymentUpdate }) {
+  const [editingPayment, setEditingPayment] = useState(null);
 
-        {payments.length === 0 ? (
-          <p>Brak wpłat</p>
-        ) : (
-          <div className="payment-list">
-            {payments.map((p, i) => (
-              <div key={i} className="payment-row">
-                <span className="payment-date">{p.paid_at}</span>
-                <span className="payment-amount">
-                  <span className="amount-value">{p.amount}</span>{' '}
-                  <span className="amount-currency">zł</span>
-                </span>
-                <span className="payment-type">
-                  {p.type === 'installment' ? 'Rata' : 'Nadpłata'}
-                </span>
-              </div>
-            ))}
+  const handleDeletePayment = async (paymentId) => {
+    if (!window.confirm('Czy na pewno chcesz usunąć tę płatność?')) {
+      return;
+    }
+
+    try {
+      const response = await deletePayment(paymentId);
+      
+      if (!response.ok) {
+        throw new Error(response.data?.detail || 'Błąd usuwania płatności');
+      }
+
+      onPaymentUpdate();
+    } catch (err) {
+      alert(`Błąd: ${err.message}`);
+    }
+  };
+
+  return (
+    <>
+      <div className="modal-backdrop" onClick={onClose}>
+        <div className="modal-content" onClick={e => e.stopPropagation()}>
+          <div className="modal-header">
+            <div className="loan-name">{loanName}</div>
+            <button className="modal-close-btn" onClick={onClose}>
+              Zamknij
+            </button>
           </div>
-        )}
+
+          {payments.length === 0 ? (
+            <p>Brak wpłat</p>
+          ) : (
+            <div className="payment-list">
+              {payments.map((p) => (
+                <div key={p.payment_id} className="payment-row-extended">
+                  <div className="payment-info">
+                    <span className="payment-date">{p.paid_at}</span>
+                    <span className="payment-amount">
+                      <span className="amount-value">{p.amount}</span>{' '}
+                      <span className="amount-currency">zł</span>
+                    </span>
+                    <span className="payment-type">
+                      {p.type === 'installment' ? 'Rata' : 'Nadpłata'}
+                    </span>
+                  </div>
+                  <div className="payment-actions">
+                    <EditButton onClick={() => setEditingPayment(p)} />
+                    <DeleteButton onClick={() => handleDeletePayment(p.payment_id)} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+
+      {editingPayment && (
+        <PaymentEditModal
+          payment={editingPayment}
+          onClose={() => setEditingPayment(null)}
+          onSuccess={() => {
+            setEditingPayment(null);
+            onPaymentUpdate();
+          }}
+        />
+      )}
+    </>
   );
 }
 
@@ -43,8 +86,10 @@ function LoanList({ refreshTrigger }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedPayments, setSelectedPayments] = useState([]);
-  const [showModal, setShowModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [currentLoanId, setCurrentLoanId] = useState(null);
   const [currentLoanName, setCurrentLoanName] = useState('');
+  const [editingLoan, setEditingLoan] = useState(null);
 
   async function fetchLoans() {
     if (!user?.user_id) return;
@@ -71,6 +116,46 @@ function LoanList({ refreshTrigger }) {
     }
   }
 
+  async function fetchPaymentsForLoan(loanId) {
+    const response = await getLoanPayments(loanId);
+    setSelectedPayments(response?.data || []);
+  }
+
+  const handleShowPayments = async (loan) => {
+    await fetchPaymentsForLoan(loan.loan_id);
+    setCurrentLoanId(loan.loan_id);
+    setCurrentLoanName(loan.name);
+    setShowPaymentModal(true);
+  };
+
+  const handleDeleteLoan = async (loanId) => {
+    if (!window.confirm('Czy na pewno chcesz usunąć ten kredyt?')) {
+      return;
+    }
+
+    try {
+      const response = await deleteLoan(loanId);
+      
+      if (!response.ok) {
+        if (response.status === 400 || response.status === 403) {
+          throw new Error('Nie można usunąć kredytu, który ma płatności');
+        }
+        throw new Error(response.data?.detail || 'Błąd usuwania kredytu');
+      }
+
+      fetchLoans();
+    } catch (err) {
+      alert(`Błąd: ${err.message}`);
+    }
+  };
+
+  const handlePaymentUpdate = async () => {
+    if (currentLoanId) {
+      await fetchPaymentsForLoan(currentLoanId);
+    }
+    fetchLoans();
+  };
+
   useEffect(() => {
     fetchLoans();
   }, [user?.user_id, refreshTrigger]);
@@ -90,8 +175,8 @@ function LoanList({ refreshTrigger }) {
         <div className="loan-cell loan-cell-header">Zapłacono</div>
         <div className="loan-cell loan-cell-header">Pozostało</div>
         <div className="loan-cell loan-cell-header">Liczba zapłaconych rat</div>
-        <div className="loan-cell loan-cell-header">Przedpłaty</div>
-        <div className="loan-cell loan-cell-header">Szczegóły</div>
+        <div className="loan-cell loan-cell-header">Nadpłaty</div>
+        <div className="loan-cell loan-cell-header">Akcje</div>
 
         {loans.map((loan) => (
           <div className="loan-row" key={loan.loan_id}>
@@ -103,28 +188,37 @@ function LoanList({ refreshTrigger }) {
             <div className="loan-cell">{loan.remaining}</div>
             <div className="loan-cell">{loan.total_installments_paid}</div>
             <div className="loan-cell">{loan.total_prepayments}</div>
-            <div className="loan-cell">
+            <div className="loan-cell loan-cell-actions">
               <button
                 className="details-btn"
-                onClick={async () => {
-                  const response = await getLoanPayments(loan.loan_id);
-                  setSelectedPayments(response?.data || []);
-                  setCurrentLoanName(loan.name);
-                  setShowModal(true);
-                }}
+                onClick={() => handleShowPayments(loan)}
               >
                 Szczegóły
               </button>
+              <EditButton onClick={() => setEditingLoan(loan)} />
+              <DeleteButton onClick={() => handleDeleteLoan(loan.loan_id)} />
             </div>
           </div>
         ))}
       </div>
 
-      {showModal && (
+      {showPaymentModal && (
         <PaymentModal
           payments={selectedPayments}
           loanName={currentLoanName}
-          onClose={() => setShowModal(false)}
+          onClose={() => setShowPaymentModal(false)}
+          onPaymentUpdate={handlePaymentUpdate}
+        />
+      )}
+
+      {editingLoan && (
+        <LoanEditModal
+          loan={editingLoan}
+          onClose={() => setEditingLoan(null)}
+          onSuccess={() => {
+            setEditingLoan(null);
+            fetchLoans();
+          }}
         />
       )}
     </>
