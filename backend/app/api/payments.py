@@ -26,6 +26,7 @@ class PaymentCreate(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 class PaymentOut(BaseModel):
+    id: uuid.UUID
     amount: Decimal
     type: PaymentType
     paid_at: date
@@ -86,17 +87,12 @@ async def get_loan_payments(
         raise HTTPException(status_code=404, detail="Loan not found")
 
     result = await db.execute(
-        select(
-            Payment.amount,
-            Payment.type,
-            Payment.paid_at
-        )
+        select(Payment)
         .where(Payment.loan_id == loan_id)
         .order_by(Payment.paid_at.desc())
     )
 
-    payments = result.all()
-
+    payments = result.scalars().all()
     return payments
 
 @router.delete("/{payment_id}", status_code=status.HTTP_200_OK)

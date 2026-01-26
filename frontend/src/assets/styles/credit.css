@@ -11,6 +11,31 @@
   flex-wrap: nowrap;
 }
 
+.credit-form input,
+.credit-form select {
+  padding: 10px 12px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.05);
+  color: white;
+  min-width: 160px;
+  outline: none;
+}
+
+.credit-form input::placeholder {
+  color: rgba(255,255,255,0.6);
+}
+
+.credit-form input:focus,
+.credit-form select:focus {
+  border-color: #2575fc;
+}
+
+.credit-form select option {
+  background: rgba(40,40,40,0.9);
+  color: white;
+}
+
 .credit-form button {
   background: linear-gradient(135deg, #42e695, #3bb2b8);
   color: white;
@@ -19,44 +44,14 @@
   padding: 10px 16px;
   border: none;
   cursor: pointer;
-  transition: transform 0.15s ease, filter 0.15s ease;
   width: 220px;
   align-self: flex-start;
+  transition: transform 0.15s ease, filter 0.15s ease;
 }
 
 .credit-form button:hover {
   filter: brightness(1.15);
   transform: translateY(-1px);
-}
-
-.credit-form input,
-.credit-form select {
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.2);
-  color: white;
-  min-width: 160px;
-  outline: none;
-}
-
-.credit-form input::placeholder {
-  color: rgba(255,255,255,0.7);
-}
-
-.credit-form input:focus,
-.credit-form select:focus {
-  border-color: white;
-}
-
-.credit-form select {
-  background: rgba(255,255,255,0.2);
-  color: white;
-}
-
-.credit-form select option {
-  background: rgba(40,40,40,0.9);
-  color: white;
 }
 
 .credit-message {
@@ -65,13 +60,8 @@
   font-weight: 600;
 }
 
-.credit-error {
-  color: #ff6b6b;
-}
-
-.credit-success {
-  color: #7bed9f;
-}
+.credit-error { color: #ff6b6b; }
+.credit-success { color: #7bed9f; }
 
 .credits-actions {
   display: flex;
@@ -89,64 +79,13 @@
   padding: 10px 16px;
   border: none;
   cursor: pointer;
-  transition: transform 0.15s ease, filter 0.15s ease;
   width: 100%;
   text-align: center;
+  transition: transform 0.15s ease, filter 0.15s ease;
 }
 
 .credit-toggle-btn:hover {
   filter: brightness(1.15);
-  transform: translateY(-1px);
-}
-
-.details-btn {
-  background: linear-gradient(135deg, #42a1f5, #2575fc);
-  color: white;
-  font-weight: 700;
-  border-radius: 6px;
-  padding: 6px 12px;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.15s ease, filter 0.15s ease;
-  font-size: 13px;
-}
-
-.details-btn:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.edit-btn {
-  background: linear-gradient(135deg, #ffa500, #ff8c00);
-  color: white;
-  font-weight: 700;
-  border-radius: 6px;
-  padding: 6px 12px;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.15s ease, filter 0.15s ease;
-  font-size: 13px;
-}
-
-.edit-btn:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.delete-btn {
-  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
-  color: white;
-  font-weight: 700;
-  border-radius: 6px;
-  padding: 6px 12px;
-  border: none;
-  cursor: pointer;
-  transition: transform 0.15s ease, filter 0.15s ease;
-  font-size: 13px;
-}
-
-.delete-btn:hover {
-  filter: brightness(1.1);
   transform: translateY(-1px);
 }
 
@@ -155,68 +94,81 @@
   grid-template-columns: repeat(9, 1fr);
   gap: 6px;
   margin-top: 20px;
-
-  background: rgba(255,255,255,0.1);
+  background: rgba(255,255,255,0.05);
   padding: 12px;
   border-radius: 12px;
-  backdrop-filter: blur(10px);
 }
 
-.loan-row {
-  display: contents;
-}
+.loan-row { display: contents; }
 
 .loan-cell {
   display: flex;
   justify-content: center;
   align-items: center;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.1);
   padding: 8px;
+  gap: 12px;
   border-radius: 6px;
   font-size: 14px;
   color: white;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  min-width: 0;
   text-align: center;
-  hyphens: auto;
-}
-
-.loan-cell-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding: 6px 4px;
+  word-wrap: break-word;
 }
 
 .loan-cell-header {
-  background: rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.2);
   font-weight: 700;
-  word-wrap: break-word;
-  overflow-wrap: break-word;
-  white-space: normal;
-  min-width: 0;
   text-align: center;
 }
 
-.loan-row:nth-child(odd) .loan-cell {
-  background: rgba(255,255,255,0.18);
+.loan-row:nth-child(odd) .loan-cell { background: rgba(255,255,255,0.08); }
+.loan-row:nth-child(even) .loan-cell { background: rgba(255,255,255,0.05); }
+.loan-row:hover .loan-cell { background: rgba(255,255,255,0.15); }
+
+.details-btn {
+  background: linear-gradient(135deg, #42a1f5, #2575fc);
+  color: white;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
 }
 
-.loan-row:nth-child(even) .loan-cell {
-  background: rgba(255,255,255,0.12);
+.edit-btn {
+  background: linear-gradient(135deg, #ffa500, #ff8c00);
+  color: white;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
 }
 
-.loan-row:hover .loan-cell {
-  background: rgba(255,255,255,0.28);
+.delete-btn {
+  background: linear-gradient(135deg, #ff6b6b, #ee5a6f);
+  color: white;
+  font-weight: 700;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 13px;
+  border: none;
+  cursor: pointer;
+}
+
+.details-btn:hover,
+.edit-btn:hover,
+.delete-btn:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
 }
 
 .modal-backdrop {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.6);
-
   display: flex;
   justify-content: center;
   align-items: center;
@@ -228,19 +180,15 @@
   max-width: 520px;
   max-height: 80%;
   overflow-y: auto;
-
-  background: rgba(255,255,255,0.15);
+  background: rgba(255,255,255,0.05);
   backdrop-filter: blur(12px);
   color: white;
-
   padding: 24px;
   border-radius: 16px;
   box-shadow: 0 8px 30px rgba(0,0,0,0.35);
 }
 
-.modal-content-small {
-  max-width: 400px;
-}
+.modal-content-small { max-width: 400px; }
 
 .modal-header {
   display: flex;
@@ -250,7 +198,7 @@
 }
 
 .modal-close-btn {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.2);
   color: white;
   border: none;
   padding: 6px 12px;
@@ -258,21 +206,15 @@
   cursor: pointer;
 }
 
-.modal-close-btn:hover {
-  background: rgba(255,255,255,0.35);
-}
+.modal-close-btn:hover { background: rgba(255,255,255,0.3); }
 
 .modal-content .loan-name {
   font-weight: 800;
   font-size: 1.2rem;
   margin-bottom: 12px;
-  color: #fff;
-  text-shadow: 0 0 5px rgba(0,0,0,0.5);
 }
 
-.payment-list {
-  margin-top: 10px;
-}
+.payment-list { margin-top: 10px; }
 
 .payment-row {
   display: flex;
@@ -298,16 +240,10 @@
   font-family: monospace;
 }
 
-.payment-actions {
-  display: flex;
-  gap: 6px;
-}
+.payment-actions { display: flex; gap: 6px; }
 
 .payment-date,
-.payment-type {
-  flex: 1;
-  text-align: left;
-}
+.payment-type { flex: 1; text-align: left; }
 
 .payment-amount {
   flex: 1;
@@ -315,26 +251,12 @@
   gap: 4px;
 }
 
-.amount-value {
-  min-width: 60px;
-  text-align: right;
-}
+.amount-value { min-width: 60px; text-align: right; }
+.amount-currency { text-align: left; }
 
-.amount-currency {
-  text-align: left;
-}
+.edit-form { display: flex; flex-direction: column; gap: 16px; }
 
-.edit-form {
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
+.form-group { display: flex; flex-direction: column; gap: 6px; }
 
 .form-group label {
   font-weight: 600;
@@ -346,22 +268,15 @@
 .form-group select {
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid rgba(255,255,255,0.4);
-  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  background: rgba(255,255,255,0.05);
   color: white;
   outline: none;
   font-size: 14px;
 }
 
 .form-group input:focus,
-.form-group select:focus {
-  border-color: white;
-}
-
-.form-group select {
-  background: rgba(255,255,255,0.2);
-  color: white;
-}
+.form-group select:focus { border-color: #2575fc; }
 
 .form-group select option {
   background: rgba(40,40,40,0.9);
@@ -390,17 +305,9 @@
 }
 
 .form-actions button[type="button"] {
-  background: rgba(255,255,255,0.25);
+  background: rgba(255,255,255,0.2);
   color: white;
 }
 
-.form-actions button:hover {
-  filter: brightness(1.1);
-  transform: translateY(-1px);
-}
-
-.form-actions button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-  transform: none;
-}
+.form-actions button:hover { filter: brightness(1.1); transform: translateY(-1px); }
+.form-actions button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }

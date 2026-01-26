@@ -12,7 +12,11 @@ function Register() {
   const [email, setEmail] = useState('');
   const [login, setLogin] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   useEffect(() => {
     document.title = 'Domator – Rejestracja';
@@ -21,11 +25,37 @@ function Register() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
-    try {
-      await registerUser({ email, login, password });
-      navigate('/login');
-    } catch (err) {
-      setError(err.message || 'Błąd rejestracji');
+    setSuccess(null);
+
+    if (!email.trim() || !login.trim() || !password.trim() || !confirmPassword.trim()) {
+      setError('Wszystkie pola muszą być wypełnione');
+      return;
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(email)) {
+      setError('Podaj poprawny adres email');
+      return;
+    }
+
+    if (password.length < 6) {
+      setError('Hasło musi mieć minimum 6 znaków');
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError('Hasło i potwierdzenie hasła muszą być takie same');
+      return;
+    }
+
+    const result = await registerUser({ email, login, password });
+
+    if (result.ok) {
+      setSuccess('Konto zostało utworzone pomyślnie!');
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000);
+    } else {
+      setError(result.data?.detail || 'Błąd rejestracji. Sprawdź dane.');
     }
   };
 
@@ -35,7 +65,7 @@ function Register() {
         <Logo />
         <div className="app-name">Domator</div>
 
-        <form onSubmit={handleSubmit} style={{ width: '100%' }}>
+        <form onSubmit={handleSubmit} className="auth-form">
           <Input
             placeholder="Email"
             value={email}
@@ -47,17 +77,21 @@ function Register() {
             onChange={e => setLogin(e.target.value)}
           />
           <Input
-            type="password"
+            isPassword={true}
             placeholder="Hasło"
             value={password}
             onChange={e => setPassword(e.target.value)}
           />
 
-          {error && (
-            <div className="auth-error">
-              Nie udało się utworzyć konta. Sprawdź dane i spróbuj ponownie.
-            </div>
-          )}
+          <Input
+            isPassword={true}
+            placeholder="Potwierdź hasło"
+            value={confirmPassword}
+            onChange={e => setConfirmPassword(e.target.value)}
+          />
+
+          {error && <div className="auth-error">{error}</div>}
+          {success && <div className="auth-success">{success}</div>}
 
           <Button type="submit">Zarejestruj</Button>
         </form>

@@ -9,14 +9,34 @@ export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const logout = useCallback(async () => {
+    const currentRefreshToken = localStorage.getItem('refresh_token');
+    if (currentRefreshToken) {
+      try {
+        await apiLogout(currentRefreshToken);
+      } catch (err) {
+        console.error("Błąd podczas wylogowywania w API", err);
+      }
+    }
+
+    localStorage.removeItem('access_token');
+    localStorage.removeItem('refresh_token');
+    localStorage.removeItem('user_id');
+
+    setUser(null);
+    navigate('/login');
+  }, [navigate]);
+
   const refresh = useCallback(async () => {
-    if (!user?.refresh_token) {
+    const currentRefreshToken = localStorage.getItem('refresh_token');
+
+    if (!currentRefreshToken) {
       await logout();
       return null;
     }
 
     try {
-      const response = await apiRefreshToken(user.refresh_token);
+      const response = await apiRefreshToken(currentRefreshToken);
       
       if (!response.ok) {
         await logout();
@@ -28,22 +48,17 @@ export function AuthProvider({ children }) {
       localStorage.setItem('access_token', access_token);
       localStorage.setItem('refresh_token', refresh_token);
 
-      const updatedUser = { ...user, access_token, refresh_token };
-      setUser(updatedUser);
+      setUser(prev => ({ ...prev, access_token, refresh_token }));
       
       return access_token;
-    } catch {
+    } catch (err) {
       await logout();
       return null;
     }
-  }, [user]);
+  }, [logout]);
 
   useEffect(() => {
-    if (user) {
-      setAuthContext({ user, refresh });
-    } else {
-      setAuthContext({ user: null, refresh });
-    }
+    setAuthContext({ user, refresh });
   }, [user, refresh]);
 
   useEffect(() => {
@@ -62,7 +77,7 @@ export function AuthProvider({ children }) {
     try {
       const result = await apiLogin({ identifier, password });
 
-      if (!result.ok || !result.data.access_token || !result.data.user_id) {
+      if (!result.ok) {
         return { ok: false, data: result.data };
       }
 
@@ -77,23 +92,8 @@ export function AuthProvider({ children }) {
       navigate('/dashboard');
       return { ok: true, data: result.data };
     } catch (err) {
-      return { ok: false, error: err.message || 'Błąd logowania' };
+      return { ok: false, error: 'Błąd połączenia' };
     }
-  };
-
-  const logout = async () => {
-    if (user?.refresh_token) {
-      try {
-        await apiLogout(user.refresh_token);
-      } catch {}
-    }
-
-    localStorage.removeItem('access_token');
-    localStorage.removeItem('refresh_token');
-    localStorage.removeItem('user_id');
-
-    setUser(null);
-    navigate('/login');
   };
 
   return (

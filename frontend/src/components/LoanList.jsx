@@ -16,15 +16,10 @@ function PaymentModal({ payments, loanName, onClose, onPaymentUpdate }) {
     }
 
     try {
-      const response = await deletePayment(paymentId);
-      
-      if (!response.ok) {
-        throw new Error(response.data?.detail || 'Błąd usuwania płatności');
-      }
-
+      await deletePayment(paymentId);
       onPaymentUpdate();
     } catch (err) {
-      alert(`Błąd: ${err.message}`);
+      alert(err.response?.data?.detail || 'Błąd usuwania płatności');
     }
   };
 
@@ -44,7 +39,7 @@ function PaymentModal({ payments, loanName, onClose, onPaymentUpdate }) {
           ) : (
             <div className="payment-list">
               {payments.map((p) => (
-                <div key={p.payment_id} className="payment-row-extended">
+                <div key={p.id} className="payment-row-extended">
                   <div className="payment-info">
                     <span className="payment-date">{p.paid_at}</span>
                     <span className="payment-amount">
@@ -57,7 +52,7 @@ function PaymentModal({ payments, loanName, onClose, onPaymentUpdate }) {
                   </div>
                   <div className="payment-actions">
                     <EditButton onClick={() => setEditingPayment(p)} />
-                    <DeleteButton onClick={() => handleDeletePayment(p.payment_id)} />
+                    <DeleteButton onClick={() => handleDeletePayment(p.id)} />
                   </div>
                 </div>
               ))}

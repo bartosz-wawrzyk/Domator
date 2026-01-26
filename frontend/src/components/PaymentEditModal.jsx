@@ -24,16 +24,11 @@ function PaymentEditModal({ payment, onClose, onSuccess }) {
     setError(null);
 
     try {
-      const response = await updatePayment(payment.payment_id, formData);
-      
-      if (!response.ok) {
-        throw new Error(response.data?.detail || 'Błąd aktualizacji płatności');
-      }
-
+      await updatePayment(payment.id, formData);
       onSuccess();
       onClose();
     } catch (err) {
-      setError(err.message);
+      setError(err.response?.data?.detail || 'Błąd aktualizacji płatności');
     } finally {
       setLoading(false);
     }

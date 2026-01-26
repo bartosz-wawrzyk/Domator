@@ -13,48 +13,60 @@ async function request(endpoint, options = {}) {
     headers['Authorization'] = `Bearer ${authContextRef.user.access_token}`;
   }
 
-  let response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
-  let data = await response.json();
+  try {
+    let response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
 
-  if (
-    response.status === 401 &&
-    authContextRef &&
-    !endpoint.startsWith('/auth/login') &&
-    !endpoint.startsWith('/auth/register')
-  ) {
-    const newToken = await authContextRef.refresh();
-    if (newToken) {
-      headers['Authorization'] = `Bearer ${newToken}`;
-      response = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+    let data = null;
+    try {
       data = await response.json();
-      if (!response.ok) return { ok: false, status: response.status, data };
-      return { ok: true, status: response.status, data };
+    } catch {
+      data = null;
     }
-    return { ok: false, status: 401, data: { detail: 'Unauthorized' } };
+
+    if (
+      response.status === 401 &&
+      authContextRef &&
+      !endpoint.startsWith('/auth/login') &&
+      !endpoint.startsWith('/auth/register') &&
+      !endpoint.startsWith('/auth/refresh')
+    ) {
+      const newToken = await authContextRef.refresh();
+
+      if (newToken) {
+        headers['Authorization'] = `Bearer ${newToken}`;
+        const retryResponse = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
+        
+        let retryData = null;
+        try {
+          retryData = await retryResponse.json();
+        } catch {
+          retryData = null;
+        }
+
+        return { ok: retryResponse.ok, status: retryResponse.status, data: retryData };
+      }
+      
+      return { ok: false, status: 401, data: { detail: 'Sesja wygasła. Zaloguj się ponownie.' } };
+    }
+
+    return { ok: response.ok, status: response.status, data };
+
+  } catch (err) {
+    return { ok: false, status: 0, data: { detail: err?.message || 'Błąd połączenia z serwerem' } };
   }
-
-  return {
-    ok: response.ok,
-    status: response.status,
-    data,
-  };
 }
 
-export function healthCheck() {
-  return request('/health');
-}
-
-export function registerUser({ email, login, password }) {
+export function registerUser(userData) {
   return request('/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ email, login, password }),
+    body: JSON.stringify(userData),
   });
 }
 
-export function loginUser({ identifier, password }) {
+export function loginUser(credentials) {
   return request('/auth/login', {
     method: 'POST',
-    body: JSON.stringify({ identifier, password }),
+    body: JSON.stringify(credentials),
   });
 }
 

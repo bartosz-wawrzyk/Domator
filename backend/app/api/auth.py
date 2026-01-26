@@ -53,6 +53,7 @@ async def register_user(
     )
 
     return await UserRepository.create(db, user)
+
 @router.post(
     "/login",
     response_model=TokenResponse,
@@ -72,6 +73,9 @@ async def login_user(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",
         )
+
+    await UserRepository.limit_active_sessions(db, user.id, max_sessions=5)
+    # ------------------------------------------------
 
     access_token = create_access_token(str(user.id))
     refresh_token = create_refresh_token(str(user.id))
