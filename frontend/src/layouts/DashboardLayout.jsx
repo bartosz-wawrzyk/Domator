@@ -3,7 +3,7 @@ import Logo from '../components/Logo';
 import '../assets/styles/dashboard.css';
 
 const menuConfig = [
-  { id: 'auto', label: 'Auto' },
+  { id: 'pojazdy', label: 'Pojazdy' },
   { id: 'finanse', label: 'Finanse' },
   { id: 'kredyty', label: 'Kredyty' },
   { id: 'planer', label: 'Planer posiłków' },

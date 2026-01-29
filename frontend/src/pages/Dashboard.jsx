@@ -1,7 +1,7 @@
 import { useState, useContext, useEffect } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import CreditsDashboard from '../pages/CreditsDashboard';
-import CarDashboard from '../pages/CarDashboard';
+import VehiclesDashboard from '../pages/VehiclesDashboard';
 import FinancesDashboard from '../pages/FinancesDashboard';
 import PlanerDashboard from '../pages/PlanerDashboard';
 import { AuthContext } from '../context/AuthContext';
@@ -23,7 +23,7 @@ function Dashboard() {
 
   const renderContent = () => {
     switch (activeMenu) {
-      case 'auto': return <CarDashboard />;
+      case 'pojazdy': return <VehiclesDashboard />;
       case 'finanse': return <FinancesDashboard />;
       case 'kredyty':
         return (
@@ -39,9 +39,9 @@ function Dashboard() {
             <h1 className="welcome-title">Witaj w systemie do zarządzania domem</h1>
             <p className="welcome-subtitle">Wybierz jedną z opcji poniżej, aby rozpocząć:</p>
             <div className="welcome-tiles">
-              <div className="tile" onClick={() => setActiveMenu('auto')}>
+              <div className="tile" onClick={() => setActiveMenu('pojazdy')}>
                 <div className="tile-icon">🚗</div>
-                <div className="tile-title">Auto</div>
+                <div className="tile-title">Pojazdy</div>
                 <div className="tile-desc">Zarządzaj swoimi pojazdami i wydatkami.</div>
               </div>
               <div className="tile" onClick={() => setActiveMenu('finanse')}>

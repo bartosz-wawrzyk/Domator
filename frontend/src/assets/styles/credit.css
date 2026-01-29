@@ -68,7 +68,6 @@
   flex-direction: column;
   gap: 12px;
   margin-bottom: 15px;
-  width: 220px;
 }
 
 .credit-toggle-btn {
@@ -79,7 +78,7 @@
   padding: 10px 16px;
   border: none;
   cursor: pointer;
-  width: 100%;
+  width: 220px;
   text-align: center;
   transition: transform 0.15s ease, filter 0.15s ease;
 }
@@ -311,3 +310,36 @@
 
 .form-actions button:hover { filter: brightness(1.1); transform: translateY(-1px); }
 .form-actions button:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+.service-details-expanded {
+  animation: slideDown 0.3s ease-out;
+  border-left: 4px solid #007bff;
+  margin-left: 10px;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.items-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  color: #007bff;
+  font-weight: bold;
+  font-size: 0.9rem;
+}
+
+.service-item-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 0.85rem;
+}
+
+.service-item-row:last-child {
+  border-bottom: none;
+}
