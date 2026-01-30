@@ -26,6 +26,8 @@
 - SQLAlchemy
 - Pydantic
 - PostgreSQL 16
+- **Pytest & HTTPX**
+- **Argon2**
 
 ### Frontend
 - React (JSX)
@@ -45,6 +47,7 @@
 Domator/
 ├── backend/
 │   ├── app/
+|   ├── tests/
 │   ├── Dockerfile
 │   ├── requirements.txt
 │   └── .env
@@ -88,6 +91,28 @@ Domator/
 ---
 
 ## Running the Application
+
+---
+
+## Testing
+
+The application uses **Pytest** for integration testing of the authentication flow. The tests use an asynchronous database session and a dedicated test client.
+
+### Running Tests
+To run the backend tests, ensure you are in the `backend` directory and your virtual environment is active:
+
+```bash
+cd backend
+
+# Run the entire test suite
+python -m pytest
+
+# Run main application startup and health check tests
+python -m pytest tests/test_main.py
+
+# Run only authentication and authorization tests
+python -m pytest tests/test_api/test_auth.py
+```
 
 ### Locally
 
@@ -156,10 +181,10 @@ docker-compose down
 | `POSTGRES_DB` | Database name | `domator_db` |
 | `POSTGRES_HOST` | Database host | `localhost` or `db` (Docker) |
 | `POSTGRES_PORT` | Database port | `5432` |
-| `JWT_SECRET_KEY` | JWT signing key | `your-secret-key-here` |
-| `JWT_ALGORITHM` | JWT algorithm | `HS256` |
-| `ACCESS_TOKEN_EXPIRE_MINUTES` | Access token expiration time (minutes) | `30` |
-| `REFRESH_TOKEN_DAYS` | Refresh token expiration time (days) | `7` |
+| `jwt_secret_key` | JWT signing key | `your-secret-key-here` |
+| `jwt_algorithm` | JWT algorithm | `HS256` |
+| `access_token_expire_minutes` | Access token expiration (min) | `15` |
+| `refresh_token_expire_days` | Refresh token expiration (days) | `7` |
 | `CORS_ORIGINS` | Allowed origins (comma-separated) | `http://localhost:5173,http://localhost:3000` |
 
 ### Frontend (`.env`)
@@ -188,12 +213,12 @@ docker-compose down
   - Record loan installments and overpayments
   - Monitor loan repayment progress
 
-### Planned Features
 - **Vehicle Maintenance**
   - Service history tracking
   - Inspection reminders
   - Insurance (OC) management 
 
+### Planned Features
 - **Household Finances**
   - Income and expense tracking
   - Budget planning and monitoring

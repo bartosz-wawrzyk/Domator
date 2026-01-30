@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, UTC
 from fastapi import APIRouter, Depends, HTTPException, status, Body
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.db.deps import get_db
+from app.db.deps import get_db, get_current_user
 from app.db.models.user import UserCreate, UserPublic, LoginRequest, TokenResponse
 from app.db.models.refresh_token import RefreshToken
 from app.db.repositories.user import UserRepository, User
@@ -75,7 +75,6 @@ async def login_user(
         )
 
     await UserRepository.limit_active_sessions(db, user.id, max_sessions=5)
-    # ------------------------------------------------
 
     access_token = create_access_token(str(user.id))
     refresh_token = create_refresh_token(str(user.id))
@@ -83,7 +82,7 @@ async def login_user(
     refresh_token_db = RefreshToken(
         user_id=user.id,
         token_hash=hash_token(refresh_token),
-        expires_at=datetime.utcnow()
+        expires_at=datetime.now(UTC)
         + timedelta(days=settings.refresh_token_expire_days),
     )
 
@@ -91,7 +90,7 @@ async def login_user(
         db, refresh_token_db
     )
 
-    user.last_login_at = datetime.utcnow()
+    user.last_login_at = datetime.now(UTC)
     await db.commit()
 
     return TokenResponse(
@@ -137,7 +136,7 @@ async def refresh_tokens(
     new_db_token = RefreshToken(
         user_id=db_token.user_id,
         token_hash=hash_token(new_refresh_token),
-        expires_at=datetime.utcnow()
+        expires_at=datetime.now(UTC)
         + timedelta(days=settings.refresh_token_expire_days),
     )
 
@@ -149,3 +148,7 @@ async def refresh_tokens(
         user_id=db_token.user_id,
         message="Refreshed token",
     )
+
+@router.get("/me", response_model=UserPublic)
+async def get_me(current_user: User = Depends(get_current_user)):
+    return current_user

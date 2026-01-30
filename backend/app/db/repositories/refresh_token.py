@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, UTC
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.models.refresh_token import RefreshToken
@@ -15,7 +15,7 @@ class RefreshTokenRepository:
             select(RefreshToken).where(
                 RefreshToken.token_hash == token_hash,
                 RefreshToken.revoked_at.is_(None),
-                RefreshToken.expires_at > datetime.utcnow(),
+                RefreshToken.expires_at > datetime.now(UTC),
             )
         )
         return result.scalar_one_or_none()
@@ -25,7 +25,7 @@ class RefreshTokenRepository:
         session: AsyncSession,
         token: RefreshToken,
     ) -> None:
-        token.revoked_at = datetime.utcnow()
+        token.revoked_at = datetime.now(UTC)
 
     @staticmethod
     async def revoke_by_hash(
@@ -41,7 +41,7 @@ class RefreshTokenRepository:
         token = result.scalar_one_or_none()
 
         if token:
-            token.revoked_at = datetime.utcnow()
+            token.revoked_at = datetime.now(UTC)
             await session.commit()
 
 

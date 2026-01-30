@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from contextlib import asynccontextmanager
 from app.core.config import settings
 from app.api.auth import router as auth_router
 from app.api.loans import router as loans_router
@@ -10,7 +11,20 @@ from app.db.init_db import init_db
 from app.services.cleanup import periodic_cleanup
 import asyncio
 
-app = FastAPI(title=settings.app_name)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    cleanup_task = asyncio.create_task(periodic_cleanup())
+    
+    yield 
+    
+    cleanup_task.cancel()
+    try:
+        await cleanup_task
+    except asyncio.CancelledError:
+        pass
+
+app = FastAPI(title=settings.app_name, lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -29,8 +43,3 @@ app.include_router(services_router)
 @app.get("/health")
 async def health():
     return {"status": "ok"}
-
-@app.on_event("startup")
-async def on_startup():
-    await init_db()
-    asyncio.create_task(periodic_cleanup())
