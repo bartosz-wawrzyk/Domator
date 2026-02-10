@@ -53,3 +53,12 @@ async def update_recipe_item(
     """Updates ingredient details in the recipe (quantity/note)."""
     repo = MealIngredientsRepository(db)
     return await repo.update_meal_ingredient(id_recipe, data.model_dump(exclude_unset=True))
+
+@router.get("/search", response_model=List[IngredientRead])
+async def search_ingredients(
+    name: str, 
+    db: AsyncSession = Depends(get_db)
+):
+    """Searches the ingredient dictionary by name (e.g., for autocomplete)."""
+    repo = MealIngredientsRepository(db)
+    return await repo.search_ingredients(name)

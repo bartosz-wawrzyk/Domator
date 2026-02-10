@@ -1,6 +1,6 @@
 import uuid
 from typing import List, Optional
-from sqlalchemy import select, delete, update
+from sqlalchemy import select, delete, update, or_
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import joinedload
 from app.db.models.meal_ingredients import Ingredient, MealIngredient
@@ -25,14 +25,21 @@ class MealIngredientsRepository:
         await self.session.commit()
 
     async def add_ingredient_to_meal(self, id_meal: uuid.UUID, data: dict) -> MealIngredient:
+        """Adds an ingredient and retrieves it with the ingredient relationship."""
         recipe_entry = MealIngredient(id_meal=id_meal, **data)
         self.session.add(recipe_entry)
         await self.session.commit()
-        await self.session.refresh(recipe_entry)
-        return recipe_entry
+        
+        query = (
+            select(MealIngredient)
+            .options(joinedload(MealIngredient.ingredient))
+            .where(MealIngredient.id == recipe_entry.id)
+        )
+        result = await self.session.execute(query)
+        return result.scalar_one()
 
     async def get_meal_recipe(self, id_meal: uuid.UUID) -> List[MealIngredient]:
-        """It retrieves the ingredients of the dish along with their data from the dictionary."""
+        """This retrieves the ingredients of the dish along with their data from the dictionary."""
         query = (
             select(MealIngredient)
             .options(joinedload(MealIngredient.ingredient))
@@ -49,14 +56,11 @@ class MealIngredientsRepository:
         """Updates the quantity or note for a specific item in the recipe."""
         update_data = {k: v for k, v in data.items() if v is not None}
         
-        query = (
+        await self.session.execute(
             update(MealIngredient)
             .where(MealIngredient.id == recipe_id)
             .values(**update_data)
-            .returning(MealIngredient)
         )
-        
-        await self.session.execute(query)
         await self.session.commit()
         
         query_refresh = (
@@ -66,3 +70,14 @@ class MealIngredientsRepository:
         )
         result = await self.session.execute(query_refresh)
         return result.scalar_one()
+    
+    async def search_ingredients(self, search_term: str, limit: int = 10) -> List[Ingredient]:
+        """Searches for ingredients in the dictionary by name."""
+        query = (
+            select(Ingredient)
+            .where(Ingredient.name.ilike(f"%{search_term}%"))
+            .order_by(Ingredient.name)
+            .limit(limit)
+        )
+        result = await self.session.execute(query)
+        return list(result.scalars().all())

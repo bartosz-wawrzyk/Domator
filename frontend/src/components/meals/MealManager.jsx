@@ -3,10 +3,13 @@ import * as mealsApi from '../../api/meals';
 
 function MealManager() {
   const [meals, setMeals] = useState([]);
+  const [filteredMeals, setFilteredMeals] = useState([]);
+  const [searchTerm, setSearchTerm] = useState('');
+  
   const [proteins, setProteins] = useState([]);
   const [bases, setBases] = useState([]);
-  
   const [availableIngredients, setAvailableIngredients] = useState([]);
+  
   const [selectedMealForRecipe, setSelectedMealForRecipe] = useState(null);
   const [recipeItems, setRecipeItems] = useState([]);
   const [editingRecipeId, setEditingRecipeId] = useState(null);
@@ -40,6 +43,7 @@ function MealManager() {
       ]);
 
       setMeals(mealsData);
+      setFilteredMeals(mealsData);
       setProteins(proteinsData);
       setBases(basesData);
       setAvailableIngredients(ingredientsData);
@@ -55,6 +59,14 @@ function MealManager() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    const filtered = meals.filter(meal => 
+      meal.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      (meal.description && meal.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    );
+    setFilteredMeals(filtered);
+  }, [searchTerm, meals]);
 
   const openRecipeEditor = async (meal) => {
     setSelectedMealForRecipe(meal);
@@ -174,16 +186,16 @@ function MealManager() {
           </div>
 
           <div style={{ 
-            backgroundColor: '#fff3e0', 
+            backgroundColor: 'rgba(255, 152, 0, 0.1)', 
             borderLeft: '5px solid #ff9800', 
             padding: '12px', 
             marginBottom: '20px',
             borderRadius: '4px',
-            color: '#e65100',
+            color: '#ff9800',
             fontSize: '0.9rem'
           }}>
             <strong>⚖️ Zasada ilości bazowej:</strong> Wpisuj ilość potrzebną na <strong>1 osobę / 1 posiłek</strong>. 
-            Jeśli gotujesz na 2 dni dla 2 osób, lista zakupów pomnoży tę wartość x4.
+            Gotowanie na więcej osób lub dni automatycznie przeliczy te wartości.
           </div>
 
           <form className="planer-form" onSubmit={handleAddIngredientToRecipe}>
@@ -215,7 +227,7 @@ function MealManager() {
             </div>
             <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
               <button className="planer-btn-submit" type="submit">
-                {editingRecipeId ? 'Zapisz zmiany w ilości' : 'Dodaj składnik do dania'}
+                {editingRecipeId ? 'Zapisz zmiany' : 'Dodaj składnik'}
               </button>
               {editingRecipeId && (
                 <button type="button" className="meal-cancel-btn" onClick={() => {
@@ -247,76 +259,116 @@ function MealManager() {
         </div>
       ) : (
         <>
-          <form className="planer-form" onSubmit={handleSubmit}>
-            <input
-              placeholder="Nazwa dania"
-              value={formData.name}
-              onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
-              required
-            />
-            <textarea
-              placeholder="Krótki opis lub sposób przygotowania"
-              value={formData.description}
-              onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))}
-            />
-            <div className="planer-form-row">
-              <select
-                value={formData.id_protein_type}
-                onChange={(e) => setFormData(p => ({ ...p, id_protein_type: e.target.value }))}
-                required
-              >
-                <option value="">— wybierz białko —</option>
-                {proteins.map(p => (
-                  <option key={p.id} value={p.id}>{p.name} ({p.category})</option>
-                ))}
-              </select>
-              <select
-                value={formData.id_base_type}
-                onChange={(e) => setFormData(p => ({ ...p, id_base_type: e.target.value }))}
-                required
-              >
-                <option value="">— wybierz bazę węglowodanową —</option>
-                {bases.map(b => (
-                  <option key={b.id} value={b.id}>{b.name} ({b.category})</option>
-                ))}
-              </select>
-            </div>
-            <label className="custom-checkbox">
-              <input
-                type="checkbox"
-                checked={formData.is_weekend_dish}
-                onChange={(e) => setFormData(p => ({ ...p, is_weekend_dish: e.target.checked }))}
-              />
-              Danie weekendowe (wymaga więcej czasu)
-            </label>
-            <div style={{ display: 'flex', gap: '10px', marginTop: '10px' }}>
-              <button className="planer-btn-submit" type="submit">
-                {editingId ? 'Zaktualizuj danie' : 'Utwórz nowe danie'}
-              </button>
-              {editingId && <button type="button" className="meal-cancel-btn" onClick={resetForm}>Anuluj</button>}
-            </div>
-          </form>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '40px', marginBottom: '30px' }}>
+            
+            <div style={{ width: '100%' }}>
+              <p>Dodaj lub edytuj podstawowe dane o daniu:</p>
+              <form className="planer-form" onSubmit={handleSubmit}>
+                <input
+                  placeholder="Nazwa dania"
+                  value={formData.name}
+                  onChange={(e) => setFormData(p => ({ ...p, name: e.target.value }))}
+                  required
+                />
+                <textarea
+                  placeholder="Krótki opis lub sposób przygotowania"
+                  value={formData.description}
+                  onChange={(e) => setFormData(p => ({ ...p, description: e.target.value }))}
+                />
+                <div className="planer-form-row">
+                  <select
+                    value={formData.id_protein_type}
+                    onChange={(e) => setFormData(p => ({ ...p, id_protein_type: e.target.value }))}
+                    required
+                  >
+                    <option value="">— wybierz białko —</option>
+                    {proteins.map(p => (
+                      <option key={p.id} value={p.id}>{p.name} ({p.category})</option>
+                    ))}
+                  </select>
+                  <select
+                    value={formData.id_base_type}
+                    onChange={(e) => setFormData(p => ({ ...p, id_base_type: e.target.value }))}
+                    required
+                  >
+                    <option value="">— wybierz bazę —</option>
+                    {bases.map(b => (
+                      <option key={b.id} value={b.id}>{b.name} ({b.category})</option>
+                    ))}
+                  </select>
+                </div>
+                
+                <label className="custom-checkbox">
+                  <input
+                    type="checkbox"
+                    checked={formData.is_weekend_dish}
+                    onChange={(e) => setFormData(p => ({ ...p, is_weekend_dish: e.target.checked }))}
+                  />
+                  Danie weekendowe
+                </label>
 
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: '20px', opacity: 0.6 }}>Ładowanie Twoich dań...</div>
-          ) : (
-            <div className="meal-list">
-              {meals.map(meal => (
-                <div key={meal.id} className="meal-row">
-                  <div className="meal-cell">
-                    <strong>{meal.name}</strong>
-                    <small>{meal.protein_type?.name} + {meal.base_type?.name}</small>
-                  </div>
-                  <div className="meal-cell" style={{ fontSize: '0.9em' }}>{meal.description}</div>
-                  <div className="meal-cell-actions">
-                    <button title="Składniki i przepis" onClick={() => openRecipeEditor(meal)}>📝</button>
-                    <button title="Edytuj podstawowe dane" onClick={() => startEdit(meal)}>✏️</button>
-                    <button title="Usuń danie całkowicie" onClick={() => handleDelete(meal.id)}>🗑️</button>
+                <div style={{ 
+                  display: 'flex', 
+                  justifyContent: 'space-between', 
+                  alignItems: 'center', 
+                  marginTop: '10px',
+                  gap: '20px',
+                  flexWrap: 'wrap'
+                }}>
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <button className="planer-btn-submit" type="submit">
+                      {editingId ? 'Zaktualizuj danie' : 'Utwórz nowe danie'}
+                    </button>
+                    {editingId && <button type="button" className="meal-cancel-btn" onClick={resetForm}>Anuluj</button>}
                   </div>
                 </div>
-              ))}
+              </form>
             </div>
-          )}
+
+            <div className="planer-form" style={{ flex: '1', minWidth: '250px' }}>
+              <p>🔍 Szukaj w swoich daniach:</p>
+              <div className="planer-form-row">
+                <input 
+                  type="text"
+                  placeholder="Wpisz nazwę dania..."
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                  style={{ width: '100%' }}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="meal-list">
+            <div className="meal-row" style={{ fontWeight: 'bold', borderBottom: '1px solid #444', background: 'rgba(255,255,255,0.05)' }}>
+              <div>Danie / Baza</div>
+              <div>Opis</div>
+              <div style={{ textAlign: 'right' }}>Akcje</div>
+            </div>
+
+            {filteredMeals.map(meal => (
+              <div key={meal.id} className="meal-row">
+                <div className="meal-cell">
+                  <strong>{meal.name} {meal.is_weekend_dish && '🏠'}</strong>
+                  <small>{meal.protein_type?.name} + {meal.base_type?.name}</small>
+                </div>
+                <div className="meal-cell" style={{ fontSize: '0.9em' }}>
+                  {meal.description || <span style={{ opacity: 0.3 }}>Brak opisu</span>}
+                </div>
+                <div className="meal-cell-actions">
+                  <button title="Składniki i przepis" onClick={() => openRecipeEditor(meal)}>📝</button>
+                  <button title="Edytuj" onClick={() => startEdit(meal)}>✏️</button>
+                  <button title="Usuń" onClick={() => handleDelete(meal.id)}>🗑️</button>
+                </div>
+              </div>
+            ))}
+
+            {filteredMeals.length === 0 && !loading && (
+              <p style={{ textAlign: 'center', padding: '40px', opacity: 0.5 }}>
+                {searchTerm ? 'Brak dań pasujących do wyszukiwania.' : 'Twoja książka kucharska jest jeszcze pusta.'}
+              </p>
+            )}
+          </div>
         </>
       )}
     </div>

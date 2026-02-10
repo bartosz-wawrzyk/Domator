@@ -167,3 +167,11 @@ async def delete_base(b_id: uuid.UUID, db: AsyncSession = Depends(get_db), curre
         await db.delete(res)
         await db.commit()
     return {"message": "Deleted"}
+
+@router.get("/search", status_code=status.HTTP_200_OK)
+async def search_meals(
+    name: str, 
+    db: AsyncSession = Depends(get_db), 
+    current_user = Depends(get_current_user)
+):
+    return await MealRepository.search_meals(db, current_user.id, name)

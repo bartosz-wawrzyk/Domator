@@ -273,3 +273,15 @@ export async function getShoppingList(startDate) {
   if (!res.ok) throw new Error(res.data?.detail || 'Błąd pobierania listy zakupów');
   return res.data;
 }
+
+export async function mealSearchIngredients(name) {
+  const res = await request(`/meals/ingredients/search?name=${encodeURIComponent(name)}`);
+  if (!res.ok) throw new Error('Błąd podczas wyszukiwania składników');
+  return res.data;
+}
+
+export async function searchMeals(name) {
+  const res = await request(`/meals/search?name=${encodeURIComponent(name)}`);
+  if (!res.ok) throw new Error('Błąd podczas wyszukiwania dań');
+  return res.data;
+}

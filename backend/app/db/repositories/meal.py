@@ -59,3 +59,15 @@ class MealRepository:
     async def get_base_types(db: AsyncSession) -> List[BaseType]:
         result = await db.execute(select(BaseType).order_by(BaseType.category))
         return list(result.scalars().all())
+    
+    @staticmethod
+    async def search_meals(db: AsyncSession, user_id: uuid.UUID, name: str) -> List[Meal]:
+        """Searches for user dishes by name."""
+        result = await db.execute(
+            select(Meal)
+            .options(joinedload(Meal.protein_type), joinedload(Meal.base_type))
+            .where(Meal.user_id == user_id, Meal.name.ilike(f"%{name}%"))
+            .order_by(Meal.name)
+            .limit(20)
+        )
+        return list(result.scalars().all())
