@@ -14,7 +14,9 @@ from app.core.security import (
     hash_token,
     hash_password,
 )
-from app.core.config import settings
+from app.core.config import get_settings
+
+settings = get_settings()
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 

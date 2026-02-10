@@ -3,7 +3,9 @@ import hashlib
 from datetime import datetime, timedelta, UTC
 from jose import jwt
 from passlib.context import CryptContext
-from app.core.config import settings
+from app.core.config import get_settings
+
+settings = get_settings()
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 

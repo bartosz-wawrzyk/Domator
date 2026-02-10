@@ -5,7 +5,9 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt, JWTError
 from app.db.repositories.user import UserRepository
-from app.core.config import settings
+from app.core.config import get_settings
+
+settings = get_settings()
 
 bearer_scheme = HTTPBearer()
 

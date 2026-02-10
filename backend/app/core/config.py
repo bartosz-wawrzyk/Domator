@@ -1,6 +1,7 @@
 from typing import List, Union, Any
-from pydantic import field_validator
+from functools import lru_cache
 from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic import field_validator
 import json
 
 class Settings(BaseSettings):
@@ -18,16 +19,19 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int
     refresh_token_expire_days: int
 
-    cors_origins: Union[str, List[str]] = []
+    cors_origins: Union[str, List[str]] = ""
 
     @field_validator("cors_origins", mode="before")
     @classmethod
     def assemble_cors_origins(cls, v: Any) -> List[str]:
-        if isinstance(v, str) and not v.startswith("["):
+        if isinstance(v, str):
+            v = v.strip()
+            if not v:
+                return []
+            if v.startswith("["):
+                return json.loads(v)
             return [i.strip() for i in v.split(",") if i.strip()]
-        elif isinstance(v, str) and v.startswith("["):
-            return json.loads(v)
-        elif isinstance(v, list):
+        if isinstance(v, list):
             return v
         return []
 
@@ -40,8 +44,10 @@ class Settings(BaseSettings):
         )
 
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=".env",  # <- tutaj tylko nazwa pliku .env w backend/
         case_sensitive=False
     )
 
-settings = Settings()
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

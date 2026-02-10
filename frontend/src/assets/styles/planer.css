@@ -1,0 +1,444 @@
+.planer-container {
+  width: 100%;
+  max-width: 1500px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sub-nav {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 10px;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sub-nav-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.7);
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.sub-nav-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.sub-nav-btn.active {
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  border: none;
+  box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
+}
+
+.planer-content {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  min-height: 400px;
+}
+
+.tab-pane h3 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.tab-pane p {
+  color: rgba(255, 255, 255, 0.7);
+  line-height: 1.6;
+}
+
+.planer-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.planer-form-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.planer-form input, 
+.planer-form select, 
+.planer-form textarea {
+  padding: 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(0, 0, 0, 0.2);
+  color: white;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.planer-form input:focus,
+.planer-form textarea:focus {
+  border-color: #2575fc;
+}
+
+.planer-form select {
+  background-color: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 12px;
+  padding-right: 30px;
+  outline: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=US-ASCII,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='10'><polygon points='0,0 10,0 5,5' fill='white'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  background-size: 10px;
+  cursor: pointer;
+}
+
+.planer-form select:focus {
+  border-color: #2575fc;
+}
+
+.planer-btn-submit {
+  background: linear-gradient(135deg, #42e695, #3bb2b8);
+  color: white;
+  font-weight: 700;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, filter 0.2s;
+  align-self: flex-start;
+}
+
+.planer-btn-submit:hover {
+  filter: brightness(1.1);
+  transform: translateY(-2px);
+}
+
+.meal-cancel-btn {
+  background: rgba(255, 0, 0, 0.7);
+  color: white;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  transition: filter 0.2s;
+}
+
+.meal-cancel-btn:hover {
+  filter: brightness(1.2);
+}
+
+.meal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  margin-top: 20px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.meal-row {
+  display: grid;
+  grid-template-columns: 2fr 3fr 100px;
+  align-items: center;
+  padding: 12px 16px;
+  color: white;
+  word-break: break-word;
+  gap: 10px;
+  transition: background 0.2s;
+}
+
+.meal-row:nth-child(odd) {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+.meal-row:nth-child(even) {
+  background: rgba(0, 0, 0, 0.35);
+}
+
+.meal-row:hover {
+  background: rgba(42, 42, 42, 0.6);
+}
+
+.meal-cell {
+  display: flex;
+  flex-direction: column;
+}
+
+.meal-cell-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.meal-cell-actions button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: white;
+}
+
+.meal-cell-actions button:hover {
+  filter: brightness(1.2);
+}
+
+@media (max-width: 600px) {
+  .sub-nav {
+    flex-direction: column;
+  }
+
+  .sub-nav-btn {
+    width: 100%;
+    text-align: center;
+  }
+
+  .planer-form-row {
+    flex-direction: column;
+  }
+
+  .meal-row {
+    grid-template-columns: 1fr;
+  }
+
+  .meal-cell-actions {
+    justify-content: flex-start;
+    margin-top: 8px;
+  }
+}
+
+.calendar-top-bar {
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+}
+
+.calendar-nav {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 5px 15px;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.current-month-display {
+  color: white;
+  margin: 0 20px;
+  text-transform: capitalize;
+  font-size: 1.3rem;
+  min-width: 200px;
+  text-align: center;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 10px;
+}
+
+.weekday-label {
+  text-align: center;
+  padding: 10px;
+  color: #2575fc;
+  font-weight: 800;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.calendar-day {
+  background: rgba(255, 255, 255, 0.03);
+  min-height: 120px;
+  border-radius: 12px;
+  padding: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s, background 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.calendar-day:hover {
+  background: rgba(255, 255, 255, 0.07);
+  transform: translateY(-2px);
+}
+
+.calendar-day.has-meal {
+  border-left: 4px solid #2575fc;
+}
+
+.delete-week-badge {
+  background: rgba(255, 68, 68, 0.1);
+  border: 1px solid rgba(255, 68, 68, 0.3);
+  color: #ff4444;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  opacity: 0.6;
+  margin-left: 10px;
+}
+
+.delete-week-badge:hover {
+  opacity: 1;
+  background: #ff4444;
+  color: white;
+}
+
+.meal-badge {
+  margin-top: 10px;
+  background: linear-gradient(135deg, #1e3c72, #2a5298);
+  padding: 8px;
+  border-radius: 8px;
+  color: white;
+}
+
+.meal-badge.out {
+  background: linear-gradient(135deg, #f093fb, #f5576c);
+}
+
+.meal-name {
+  font-weight: bold;
+  font-size: 0.85rem;
+  display: block;
+  margin-bottom: 4px;
+}
+
+.meal-info {
+  font-size: 0.7rem;
+  opacity: 0.8;
+  display: flex;
+  justify-content: space-between;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.checkbox-row {
+  display: flex;
+  gap: 20px;
+  margin: 15px 0;
+}
+
+.custom-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: white;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.meal-delete-btn {
+  background: #ff444422;
+  color: #ff4444;
+  border: 1px solid #ff4444;
+  padding: 5px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.meal-delete-btn:hover {
+  background: #ff4444;
+  color: white;
+}
+
+.generate-week-btn {
+  background: rgba(106, 17, 203, 0.2);
+  border: 1px solid rgba(106, 17, 203, 0.4);
+  color: #a29bfe;
+  font-size: 0.65rem;
+  padding: 2px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.generate-week-btn:hover {
+  background: #6a11cb;
+  color: white;
+  transform: scale(1.05);
+}
+
+.proposal-modal {
+  max-width: 600px;
+  width: 90%;
+}
+
+.proposal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  max-height: 60vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.proposal-item {
+  display: grid;
+  grid-template-columns: 100px 1fr 80px;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.03);
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.proposal-date {
+  font-size: 0.8rem;
+  color: #2575fc;
+  font-weight: bold;
+}
+
+.proposal-item select {
+  width: 100%;
+  font-size: 0.9rem;
+}
+
+.proposal-list::-webkit-scrollbar {
+  width: 6px;
+}
+.proposal-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+.proposal-list::-webkit-scrollbar-thumb {
+  background: #2575fc;
+  border-radius: 10px;
+}

@@ -26,6 +26,7 @@
 - SQLAlchemy
 - Pydantic
 - PostgreSQL 16
+- **SQLModel**
 - **Pytest & HTTPX**
 - **Argon2**
 
@@ -37,7 +38,7 @@
 - JWT (Access + Refresh Tokens)
 
 ### Infrastructure
-- Docker + Docker Compose
+- Docker + Docker Compose (Dev & Prod)
 
 ---
 
@@ -55,8 +56,9 @@ Domator/
 │   ├── src/
 │   ├── public/
 │   ├── Dockerfile
-│   └── .env
-├── docker-compose.yml
+│   └── nginx.conf
+├── docker-compose.dev.yml
+├── docker-compose.prod.yml
 ├── .env.example
 └── .gitignore
 ```
@@ -150,16 +152,28 @@ npm run dev
 
 ### Docker
 
-Docker Compose runs the backend, frontend, and PostgreSQL database in isolated containers.
+The application supports two runtime environments using Docker Compose.
+
+#### Development Environment
+Uses `docker-compose.dev.yml`, has **Hot-Reload** enabled for the backend and frontend, and volume mapping for local work.
 
 ```bash
-docker-compose up --build
+docker-compose -f docker-compose.dev.yml up --build
 ```
 
 **Services available at:**
 - API (FastAPI): `http://localhost:8000`
 - Frontend (React): `http://localhost:5173`
 - Database (PostgreSQL): port defined in `.env` (`POSTGRES_PORT`)
+
+#### Production Environment
+Uses `docker-compose.prod.yml`, optimized for performance and security.
+```bash
+docker-compose -f docker-compose.prod.yml up -d
+```
+
+* Backend/API: http://localhost:8000
+* Frontend: http://localhost (Port 80)
 
 **Stop containers:**
 ```bash
@@ -216,18 +230,18 @@ docker-compose down
 - **Vehicle Maintenance**
   - Service history tracking
   - Inspection reminders
-  - Insurance (OC) management 
+  - Insurance (OC) management
+
+- **Meal Planning**
+  - Weekly meal scheduler
+  - Shopping list generation
+  - Recipe management
 
 ### Planned Features
 - **Household Finances**
   - Income and expense tracking
   - Budget planning and monitoring
   - Financial reports and analytics
-
-- **Meal Planning**
-  - Weekly meal scheduler
-  - Shopping list generation
-  - Recipe management
 
 ---
 
