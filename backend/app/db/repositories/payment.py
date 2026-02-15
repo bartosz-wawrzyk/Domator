@@ -1,8 +1,8 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
-from app.db.models.payments import Payment
-from app.db.models.loans import Loan
+from app.db.models.payment import Payment
+from app.db.models.loan import Loan
 
 class PaymentRepository:
     @staticmethod

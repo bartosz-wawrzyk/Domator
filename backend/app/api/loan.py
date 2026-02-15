@@ -2,9 +2,9 @@ import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.deps import get_db, get_current_user
-from app.db.repositories.loans import LoanRepository
-from app.db.models.loans import Loan, LoanCreate, LoanUpdate
-from datetime import datetime
+from app.db.repositories.loan import LoanRepository
+from app.db.models.loan import Loan, LoanCreate, LoanUpdate
+from datetime import datetime, timezone
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy import text
 
@@ -23,8 +23,8 @@ async def create_loan(
         installments_count=data.installments_count,
         due_day=data.due_day,
         installment_amount=data.installment_amount,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
     )
 
     loan = await LoanRepository.create(db, loan)

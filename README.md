@@ -1,142 +1,103 @@
 # Domator
 
-**Domator** is a household management application. It enables task organization, user management, and data access through a modern React frontend and FastAPI backend.
-
----
+**Domator** is a full-stack household management system that centralizes task organization, user management, and household operations tracking.  
+Built with **FastAPI**, **React + Vite**, and **PostgreSQL**, it uses JWT-based authentication and is fully containerized via Docker.
 
 ## Table of Contents
 
 - [Technologies](#technologies)
-- [Project Structure](#project-structure)
-- [Requirements](#requirements)
-- [Configuration](#configuration)
-- [Running the Application](#running-the-application)
-  - [Locally](#locally)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Quick Start](#quick-start)
+  - [Local](#local)
   - [Docker](#docker)
+- [Testing](#testing)
 - [Environment Variables](#environment-variables)
-- [Future Features](#future-features)
-
----
+- [Troubleshooting](#troubleshooting)
 
 ## Technologies
 
 ### Backend
 - Python 3.11+
-- FastAPI
-- SQLAlchemy
+- FastAPI, SQLModel/SQLAlchemy
 - Pydantic
 - PostgreSQL 16
-- **SQLModel**
-- **Pytest & HTTPX**
-- **Argon2**
+- Pytest & HTTPX
+- Argon2 password hashing
 
 ### Frontend
-- React (JSX)
-- Vite
+- React + Vite
 
-### Authorization
-- JWT (Access + Refresh Tokens)
+### Authentication
+- JWT (access + refresh tokens)
 
 ### Infrastructure
-- Docker + Docker Compose (Dev & Prod)
+- Docker + Docker Compose (dev & prod)
 
----
+## Features
 
-## Project Structure
+### Authentication & Users
+- Registration & login
+- JWT access + refresh tokens
+- Role-ready architecture
 
-```
-Domator/
-├── backend/
-│   ├── app/
-|   ├── tests/
-│   ├── Dockerfile
-│   ├── requirements.txt
-│   └── .env
-├── frontend/
-│   ├── src/
-│   ├── public/
-│   ├── Dockerfile
-│   └── nginx.conf
-├── docker-compose.dev.yml
-├── docker-compose.prod.yml
-├── .env.example
-└── .gitignore
-```
+### Loan Management
+- Multi-loan tracking per user
+- Installment and overpayment tracking
+- Repayment progress monitoring
 
----
+### Vehicle Management
+- Service history & inspection reminders
+- Insurance (OC) tracking
 
-## Requirements
+### Meal Planning
+- Weekly meal schedules
+- Recipes & shopping list generation
 
-### Local Setup
-- Python 3.11+
-- Node.js 18+
-- PostgreSQL 16
+### Planned
+- Household finances (income/expense, budget, analytics)
+- Notification system (reminders, push/email)
 
-### Docker Setup
-- Docker
-- Docker Compose
+## Architecture
 
----
+Domator uses a layered architecture with clear separation of concerns:
 
-## Configuration
+Frontend (React)
+↓
+Backend API (FastAPI)
+↓
+Service Layer
+↓
+Data Access Layer (SQLModel / SQLAlchemy)
+↓
+PostgreSQL
 
-1. **Copy environment files:**
-   ```bash
-   cp .env.example .env
-   cp backend/.env.example backend/.env
-   ```
 
-2. **Configure environment variables** (details in [Environment Variables](#environment-variables) section)
+**Layer responsibilities:**
 
-3. **Ensure PostgreSQL is accessible** (locally or via Docker)
+- **API Layer:** request/response, route validation, no business logic  
+- **Service Layer:** business rules, database coordination  
+- **Data Layer:** ORM models, persistence logic  
 
----
+Authentication is stateless, JWT-based, with separate access and refresh tokens.
 
-## Running the Application
+## Quick Start
 
----
+### Local
 
-## Testing
-
-The application uses **Pytest** for integration testing of the authentication flow. The tests use an asynchronous database session and a dedicated test client.
-
-### Running Tests
-To run the backend tests, ensure you are in the `backend` directory and your virtual environment is active:
-
-```bash
-cd backend
-
-# Run the entire test suite
-python -m pytest
-
-# Run main application startup and health check tests
-python -m pytest tests/test_main.py
-
-# Run only authentication and authorization tests
-python -m pytest tests/test_api/test_auth.py
-```
-
-### Locally
-
-#### Backend
+**Backend:**
 
 ```bash
 cd backend
 python -m venv .venv
-
-# Linux/macOS
-source .venv/bin/activate
-
-# Windows
-.venv\Scripts\activate
-
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 uvicorn app.main:app --reload
 ```
 
-**Backend available at:** `http://localhost:8000`
+Backend: http://localhost:8000 (docs: /docs)
 
-#### Frontend
+**Frontend:**
 
 ```bash
 cd frontend
@@ -144,106 +105,79 @@ npm install
 npm run dev
 ```
 
-**Frontend available at:** `http://localhost:5173`
-
-> **Note:** Ensure `VITE_API_URL` in `frontend/.env` points to the running backend.
-
----
+Frontend: http://localhost:5173
+Ensure VITE_API_URL points to backend.
 
 ### Docker
 
-The application supports two runtime environments using Docker Compose.
-
-#### Development Environment
-Uses `docker-compose.dev.yml`, has **Hot-Reload** enabled for the backend and frontend, and volume mapping for local work.
+#### Development:
 
 ```bash
 docker-compose -f docker-compose.dev.yml up --build
 ```
 
-**Services available at:**
-- API (FastAPI): `http://localhost:8000`
-- Frontend (React): `http://localhost:5173`
-- Database (PostgreSQL): port defined in `.env` (`POSTGRES_PORT`)
+#### Production:
 
-#### Production Environment
-Uses `docker-compose.prod.yml`, optimized for performance and security.
 ```bash
-docker-compose -f docker-compose.prod.yml up -d
+docker-compose -f docker-compose.prod.yml up -d --build
 ```
 
-* Backend/API: http://localhost:8000
-* Frontend: http://localhost (Port 80)
+### Stop containers:
 
-**Stop containers:**
 ```bash
 docker-compose down
 ```
 
----
+### Logs:
+
+```bash
+docker-compose logs -f backend
+docker-compose logs -f frontend
+```
+
+## Testing
+Backend uses Pytest with async DB sessions and HTTPX client.
+
+```bash
+cd backend
+python -m pytest
+```
+
+### Run specific modules:
+
+```bash
+python -m pytest tests/test_main.py       # Startup & health
+python -m pytest tests/test_api/test_auth.py  # Auth tests
+pytest tests/test_api/test_loan.py	# Loan management (CRUD & Ownership)
+pytest tests/test_api/test_payment.py	# Payment processing & history logic
+pytest tests/test_api/test_loan_payment_integration.py	# Cross-module financial calculations
+```
+
+### Coverage includes:
+* Authentication flow: JWT issuance and secure endpoint protection.
+* Financial Integrity: Verification of loan_status view logic (summing installments and prepayments correctly).
+* Security & Ownership: Ensuring users can only access and modify their own financial records.
+* Database State: Direct session verification for precise data types (Decimal) and constraints.
+
+### Debugging Tests:
+To see detailed output and custom log messages during execution, use the -s flag:
+
+```bash
+python -m pytest tests/test_api/test_loan_payment_integration.py -s
+```
 
 ## Environment Variables
 
-### Backend (`backend/.env`)
+### Backend (backend/.env):
+* APP_NAME, DEBUG, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_HOST, POSTGRES_PORT
+* jwt_secret_key, jwt_algorithm, access_token_expire_minutes, refresh_token_expire_days
+* CORS_ORIGINS
 
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `APP_NAME` | Application name | `Domator` |
-| `DEBUG` | Debug mode | `true` / `false` |
-| `POSTGRES_USER` | PostgreSQL user | `domator_user` |
-| `POSTGRES_PASSWORD` | PostgreSQL password | `strong_password` |
-| `POSTGRES_DB` | Database name | `domator_db` |
-| `POSTGRES_HOST` | Database host | `localhost` or `db` (Docker) |
-| `POSTGRES_PORT` | Database port | `5432` |
-| `jwt_secret_key` | JWT signing key | `your-secret-key-here` |
-| `jwt_algorithm` | JWT algorithm | `HS256` |
-| `access_token_expire_minutes` | Access token expiration (min) | `15` |
-| `refresh_token_expire_days` | Refresh token expiration (days) | `7` |
-| `CORS_ORIGINS` | Allowed origins (comma-separated) | `http://localhost:5173,http://localhost:3000` |
+### Frontend (.env):
+* VITE_API_URL
 
-### Frontend (`.env`)
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `VITE_API_URL` | Backend URL | `http://localhost:8000` |
-
-### Docker Compose (`.env` in root directory)
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `POSTGRES_PORT` | Database port | `5432` |
-
----
-
-## Features
-
-### Current Features
-- **User Management**
-  - User registration and authentication
-  - Secure login with JWT tokens
-
-- **Loan Management**
-  - Add and track multiple loans
-  - Record loan installments and overpayments
-  - Monitor loan repayment progress
-
-- **Vehicle Maintenance**
-  - Service history tracking
-  - Inspection reminders
-  - Insurance (OC) management
-
-- **Meal Planning**
-  - Weekly meal scheduler
-  - Shopping list generation
-  - Recipe management
-
-### Planned Features
-- **Household Finances**
-  - Income and expense tracking
-  - Budget planning and monitoring
-  - Financial reports and analytics
-
----
+### Docker (.env):
+* POSTGRES_PORT
 
 ## Troubleshooting
 

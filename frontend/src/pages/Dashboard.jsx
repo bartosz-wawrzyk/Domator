@@ -1,6 +1,6 @@
 import { useState, useContext, useEffect } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
-import CreditsDashboard from '../pages/CreditsDashboard';
+import LoanDashboard from '../pages/LoanDashboard';
 import VehiclesDashboard from '../pages/VehiclesDashboard';
 import FinancesDashboard from '../pages/FinancesDashboard';
 import PlanerDashboard from '../pages/PlanerDashboard';
@@ -27,7 +27,7 @@ function Dashboard() {
       case 'finanse': return <FinancesDashboard />;
       case 'kredyty':
         return (
-          <CreditsDashboard
+          <LoanDashboard
             activeTab={activeKredytTab}
             setActiveTab={setActiveKredytTab}
           />

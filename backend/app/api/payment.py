@@ -8,9 +8,9 @@ from sqlalchemy import select
 from pydantic import BaseModel, Field, ConfigDict
 
 from app.db.deps import get_db, get_current_user
-from app.db.models.payments import Payment, PaymentType
-from app.db.models.loans import Loan
-from app.db.repositories.payments import PaymentRepository
+from app.db.models.payment import Payment, PaymentType
+from app.db.models.loan import Loan
+from app.db.repositories.payment import PaymentRepository
 
 router = APIRouter(prefix="/payments", tags=["Payments"])
 

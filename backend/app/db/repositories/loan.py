@@ -1,9 +1,9 @@
 import uuid
 from sqlalchemy.ext.asyncio import AsyncSession
-from app.db.models.loans import Loan
-from app.db.models.payments import Payment
+from app.db.models.loan import Loan
+from app.db.models.payment import Payment
 from sqlalchemy import select, exists
-from datetime import datetime
+from datetime import datetime, timezone
 
 class LoanRepository:
     @staticmethod
@@ -41,7 +41,7 @@ class LoanRepository:
             if value is not None:
                 setattr(loan, key, value)
         
-        loan.updated_at = datetime.utcnow()
+        loan.updated_at = datetime.now(timezone.utc)
         await db.commit()
         await db.refresh(loan)
         return loan

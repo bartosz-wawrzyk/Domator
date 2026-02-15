@@ -3,8 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 from app.core.config import get_settings
 from app.api.auth import router as auth_router
-from app.api.loans import router as loans_router
-from app.api.payments import router as payments_router
+from app.api.loan import router as loan_router
+from app.api.payment import router as payment_router
 from app.api.vehicle import router as vehicle_router
 from app.api.services import router as services_router
 from app.api.meal import router as meal_router
@@ -43,8 +43,8 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
-app.include_router(loans_router)
-app.include_router(payments_router)
+app.include_router(loan_router)
+app.include_router(payment_router)
 app.include_router(vehicle_router)
 app.include_router(services_router)
 app.include_router(meal_router)

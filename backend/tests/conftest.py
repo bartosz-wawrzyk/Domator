@@ -6,8 +6,11 @@ from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession, async_sess
 
 from app.main import app
 from app.db.base import Base
-from app.core.config import settings
 from app.db.deps import get_db
+from app.core.config import get_settings
+
+settings = get_settings()
+
 
 TEST_DATABASE_URL = settings.database_url + "_test"
 
@@ -19,6 +22,36 @@ async def db_session():
     async with engine.begin() as conn:
         await conn.execute(text("CREATE SCHEMA IF NOT EXISTS dmt;"))
         await conn.run_sync(Base.metadata.create_all)
+
+        await conn.execute(text("""
+            CREATE OR REPLACE VIEW dmt.loan_status AS
+            SELECT
+                l.id AS loan_id,
+                l.user_id,
+                l.name,
+                l.total_amount,
+                l.installments_count,
+                l.installment_amount,
+                l.due_day, 
+                COALESCE(SUM(p.amount), 0) AS total_paid,
+                l.total_amount - COALESCE(SUM(p.amount), 0) AS remaining,
+                COALESCE(
+                    SUM(CASE WHEN p.type = 'installment' THEN p.amount END),
+                    0
+                ) AS total_installments_paid,
+                COALESCE(
+                    SUM(CASE WHEN p.type = 'prepayment' THEN p.amount END),
+                    0
+                ) AS total_prepayments
+            FROM dmt.loans l
+            LEFT JOIN dmt.payments p ON p.loan_id = l.id
+            GROUP BY l.id;
+        """))
+
+        await conn.execute(text("""
+            CREATE INDEX IF NOT EXISTS idx_payments_loan_id
+            ON dmt.payments (loan_id);
+        """))
     
     session_factory = async_sessionmaker(engine, expire_on_commit=False, class_=AsyncSession)
     
@@ -26,6 +59,7 @@ async def db_session():
         yield session
     
     async with engine.begin() as conn:
+        await conn.execute(text("DROP VIEW IF EXISTS dmt.loan_status CASCADE;"))
         await conn.run_sync(Base.metadata.drop_all)
     
     await engine.dispose()
