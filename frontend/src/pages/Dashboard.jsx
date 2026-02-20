@@ -2,7 +2,7 @@ import { useState, useContext, useEffect } from 'react';
 import DashboardLayout from '../layouts/DashboardLayout';
 import LoanDashboard from '../pages/LoanDashboard';
 import VehiclesDashboard from '../pages/VehiclesDashboard';
-import FinancesDashboard from '../pages/FinancesDashboard';
+import FinanceDashboard from '../pages/FinanceDashboard';
 import PlanerDashboard from '../pages/PlanerDashboard';
 import { AuthContext } from '../context/AuthContext';
 import '../assets/styles/dashboard.css';
@@ -24,7 +24,7 @@ function Dashboard() {
   const renderContent = () => {
     switch (activeMenu) {
       case 'pojazdy': return <VehiclesDashboard />;
-      case 'finanse': return <FinancesDashboard />;
+      case 'finanse': return <FinanceDashboard />;
       case 'kredyty':
         return (
           <LoanDashboard

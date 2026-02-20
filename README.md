@@ -1,77 +1,111 @@
 # Domator
 
-**Domator** is a full-stack household management system that centralizes task organization, user management, and household operations tracking.  
-Built with **FastAPI**, **React + Vite**, and **PostgreSQL**, it uses JWT-based authentication and is fully containerized via Docker.
+**Domator** is a full-stack household management system that centralizes task organization, user management, meal planning, financial tracking, and household operations.  
+Built with **FastAPI**, **React + Vite**, and **PostgreSQL**, it leverages JWT-based authentication for security and is fully containerized using Docker for consistent development and production environments.
 
 ## Table of Contents
 
 - [Technologies](#technologies)
 - [Features](#features)
-- [Architecture](#architecture)
+- [Architecture & Best Practices](#architecture--best-practices)
+- [Household Finances](#household-finances)
 - [Quick Start](#quick-start)
   - [Local](#local)
   - [Docker](#docker)
-- [Testing](#testing)
+- [Testing & Quality Assurance](#testing--quality-assurance)
 - [Environment Variables](#environment-variables)
 - [Troubleshooting](#troubleshooting)
+- [Planned Features](#planned-features)
+- [Contribution Guidelines](#contribution-guidelines)
 
 ## Technologies
 
 ### Backend
-- Python 3.11+
-- FastAPI, SQLModel/SQLAlchemy
-- Pydantic
-- PostgreSQL 16
-- Pytest & HTTPX
-- Argon2 password hashing
+- **Python 3.11+** – modern features and type hints for maintainable code  
+- **FastAPI** – high-performance async web framework  
+- **SQLModel / SQLAlchemy** – ORM with type safety and database abstraction  
+- **Pydantic** – data validation and serialization  
+- **PostgreSQL 16** – relational database with support for transactions and async queries  
+- **Pytest & HTTPX** – unit and integration testing with async support  
+- **Argon2 password hashing** – secure credential storage
 
 ### Frontend
-- React + Vite
+- **React + Vite** – modular, fast, and maintainable frontend  
+- Component-based architecture with reusable, testable UI elements  
+- State management via React Context (or Redux if applicable)  
+- Form validation and error handling for robust UX  
 
-### Authentication
-- JWT (access + refresh tokens)
+### Authentication & Security
+- JWT-based authentication (access & refresh tokens)  
+- Role-ready architecture for fine-grained permissions  
+- Secure API endpoints across meals, finances, and loans  
 
 ### Infrastructure
-- Docker + Docker Compose (dev & prod)
+- **Docker & Docker Compose** – separate development and production environments  
+- Containerized backend and frontend for reproducibility and simplified deployment  
+- Environment variable management for security and configuration
 
 ## Features
 
+Domator centralizes household management, meal planning, and finances with a full-stack approach. All features are built with security, maintainability, and testability in mind.
+
 ### Authentication & Users
-- Registration & login
-- JWT access + refresh tokens
-- Role-ready architecture
+- **Registration & Login** – secure JWT-based authentication with access and refresh tokens  
+- **Role-ready architecture** – fine-grained access control prepared for future extensions  
+- **Password security** – Argon2 hashing ensures strong password storage  
 
 ### Loan Management
-- Multi-loan tracking per user
-- Installment and overpayment tracking
-- Repayment progress monitoring
+- **Multi-loan tracking per user** – supports multiple loans with installment and overpayment monitoring  
+- **Repayment progress** – calculates remaining balances and expected payoff dates  
+- **Ownership & Security** – users can only access and modify their own financial records  
 
 ### Vehicle Management
-- Service history & inspection reminders
-- Insurance (OC) tracking
+- **Service history tracking** – log maintenance, inspections, and repairs  
+- **Insurance management** – OC insurance details and expiration reminders  
+- **Notifications** – future-ready for automated service or insurance reminders  
 
 ### Meal Planning
-- Weekly meal schedules
-- Recipes & shopping list generation
+- **Weekly meal schedules** – plan meals and assign recipes  
+- **Recipes & Shopping List** – generate shopping lists automatically from weekly plan  
+- **API Security** – JWT access token required for all meal planning endpoints  
 
-### Planned
-- Household finances (income/expense, budget, analytics)
-- Notification system (reminders, push/email)
+### Household Finances
+- **Account Management** – create, edit, and manage multiple bank accounts  
+- **CSV Import** – import transactions from Santander and mBank  
+- **Automatic Categorization** – configurable rules assign transactions to categories  
+- **Financial Insights** – monthly summaries, trend analysis, and spending breakdowns  
+- **Secure API** – all finance endpoints protected with JWT; role-ready permissions  
 
-## Architecture
+### Planned Features
+- **Notification System** – push/email reminders for meal plans, loans, and vehicle services  
+- **Advanced Financial Analytics** – predictive insights, budget recommendations, and reporting  
 
-Domator uses a layered architecture with clear separation of concerns:
+## Architecture & Best Practices
 
-Frontend (React)
-↓
-Backend API (FastAPI)
-↓
-Service Layer
-↓
-Data Access Layer (SQLModel / SQLAlchemy)
-↓
-PostgreSQL
+Domator is built with a clear, maintainable architecture following modern full-stack principles:
 
+- **Layered backend**:  
+  - **API Layer** – handles HTTP requests/responses, input validation, no business logic  
+  - **Service Layer** – implements business rules, orchestrates database operations  
+  - **Repository / Data Layer** – ORM models (SQLModel/SQLAlchemy), persistence, queries
+
+- **Authentication & Security**:  
+  - JWT access & refresh tokens for stateless authentication  
+  - Argon2 hashing for passwords  
+  - Role-ready architecture for fine-grained access control  
+  - Secure endpoints for all meal planning and financial APIs
+
+- **Frontend architecture**:  
+  - Modular React components with Vite  
+  - Full integration with backend APIs  
+  - State management with React Context (or Redux if applicable)  
+  - Form validation and error handling for robust UX
+
+- **Quality & maintainability**:  
+  - Comprehensive unit and integration tests with Pytest & HTTPX  
+  - Async DB sessions for scalability  
+  - Dockerized dev and production environments for reproducibility  
+  - Clear separation of concerns, consistent coding standards, and type safety
 
 **Layer responsibilities:**
 
@@ -81,108 +115,81 @@ PostgreSQL
 
 Authentication is stateless, JWT-based, with separate access and refresh tokens.
 
-## Quick Start
-
-### Local
-
-**Backend:**
-
-```bash
-cd backend
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
-pip install -r requirements.txt
-uvicorn app.main:app --reload
-```
-
-Backend: http://localhost:8000 (docs: /docs)
-
-**Frontend:**
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Frontend: http://localhost:5173
-Ensure VITE_API_URL points to backend.
-
-### Docker
-
-#### Development:
-
-```bash
-docker-compose -f docker-compose.dev.yml up --build
-```
-
-#### Production:
-
-```bash
-docker-compose -f docker-compose.prod.yml up -d --build
-```
-
-### Stop containers:
-
-```bash
-docker-compose down
-```
-
-### Logs:
-
-```bash
-docker-compose logs -f backend
-docker-compose logs -f frontend
-```
-
-## Testing
-Backend uses Pytest with async DB sessions and HTTPX client.
-
-```bash
-cd backend
-python -m pytest
-```
-
-### Run specific modules:
-
-```bash
-python -m pytest tests/test_main.py       # Startup & health
-python -m pytest tests/test_api/test_auth.py  # Auth tests
-pytest tests/test_api/test_loan.py	# Loan management (CRUD & Ownership)
-pytest tests/test_api/test_payment.py	# Payment processing & history logic
-pytest tests/test_api/test_loan_payment_integration.py	# Cross-module financial calculations
-```
-
-### Coverage includes:
-* Authentication flow: JWT issuance and secure endpoint protection.
-* Financial Integrity: Verification of loan_status view logic (summing installments and prepayments correctly).
-* Security & Ownership: Ensuring users can only access and modify their own financial records.
-* Database State: Direct session verification for precise data types (Decimal) and constraints.
-
-### Debugging Tests:
-To see detailed output and custom log messages during execution, use the -s flag:
-
-```bash
-python -m pytest tests/test_api/test_loan_payment_integration.py -s
-```
-
 ## Environment Variables
 
-### Backend (backend/.env):
-* APP_NAME, DEBUG, POSTGRES_USER, POSTGRES_PASSWORD, POSTGRES_DB, POSTGRES_HOST, POSTGRES_PORT
-* jwt_secret_key, jwt_algorithm, access_token_expire_minutes, refresh_token_expire_days
-* CORS_ORIGINS
+Domator relies on environment variables to configure backend, frontend, and Docker environments. Properly setting these ensures security, reproducibility, and flexibility.
 
-### Frontend (.env):
-* VITE_API_URL
+### Backend (.env)
+```text
+APP_NAME=Domator
+DEBUG=True
+POSTGRES_USER=your_db_user
+POSTGRES_PASSWORD=your_db_password
+POSTGRES_DB=domator
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+JWT_SECRET_KEY=your_jwt_secret
+JWT_ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=60
+REFRESH_TOKEN_EXPIRE_DAYS=7
+CORS_ORIGINS=http://localhost:5173
+```
 
-### Docker (.env):
-* POSTGRES_PORT
+### Frontend (.env)
+```text
+VITE_API_URL=http://localhost:8000
+```
+
+### Docker (.env)
+```text
+POSTGRES_PORT=5432
+```
+
+⚠️ Ensure that .env files are never committed to version control if they contain sensitive credentials.
 
 ## Troubleshooting
 
-If you encounter issues, check:
-1. All environment variables are correctly set
-2. PostgreSQL is running and accessible
-3. Backend logs: `docker-compose logs backend`
-4. Frontend logs: `docker-compose logs frontend`
+### If you encounter issues while running Domator, check the following:
+* Environment Variables
+* Make sure all required variables are set correctly for backend, frontend, and Docker.
+* Database Connectivity
+* Ensure PostgreSQL is running and accessible on the configured host/port.
+* Check credentials and database name.
+* Backend Issues
+* View backend logs: docker-compose logs -f backend or uvicorn app.main:app --reload for local dev
+* Verify that required Python packages are installed: pip install -r requirements.txt
+* Frontend Issues
+* View frontend logs: docker-compose logs -f frontend or npm run dev locally
+* Ensure VITE_API_URL points to the correct backend URL
+* Docker Issues
+* Remove existing containers if stuck: docker-compose down --volumes
+* Rebuild images if errors persist: docker-compose up --build
+* API Authentication Errors
+* Ensure JWT access tokens are provided for protected endpoints
+* Refresh expired tokens or check token configuration in .env
+
+## Planned Features
+
+Domator is designed to evolve with additional functionality to improve household management and user experience. Upcoming features include:
+
+- **Notification System**  
+  - Push and email reminders for meal plans, loan repayments, and vehicle services  
+  - Configurable notification preferences per user  
+
+- **Advanced Financial Analytics**  
+  - Predictive insights for budgeting and spending trends  
+  - Visual dashboards and exportable reports  
+
+- **User Customization**  
+  - Personalized dashboards and widget configuration  
+  - Dark/light mode and interface language preferences  
+
+- **Enhanced Security & Access Control**  
+  - Multi-factor authentication for sensitive operations  
+  - Role-based permissions with granular access to modules  
+
+- **Cross-Module Integrations**  
+  - Linking meal planning, finances, and household tasks for automated suggestions  
+  - API hooks for third-party services (banks, recipe APIs, calendars)
+
+> These features are planned for future releases and aim to increase usability, automation, and security while maintaining a clean and scalable architecture.

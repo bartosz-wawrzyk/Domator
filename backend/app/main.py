@@ -12,6 +12,7 @@ from app.api.meal_planner import router as meal_planner_router
 from app.api.settings.meal_settings import router as meal_settings_router
 from app.api.meals_ingredients import router as meals_ingredients_router
 from app.api.meal_analysis import router as meal_analysis_router
+from app.api.finance import router as finance_router
 from app.db.init_db import init_db
 from app.services.cleanup import periodic_cleanup
 import asyncio
@@ -60,6 +61,7 @@ app.include_router(
     tags=["Settings - Meals"]
 )
 app.include_router(meals_ingredients_router)
+app.include_router(finance_router)
 
 @app.get("/health")
 async def health():

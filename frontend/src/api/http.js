@@ -7,7 +7,11 @@ export function setAuthContext(context) {
 }
 
 async function request(endpoint, options = {}) {
-  const headers = { 'Content-Type': 'application/json', ...(options.headers || {}) };
+  const headers = { ...(options.headers || {}) };
+
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (authContextRef?.user?.access_token) {
     headers['Authorization'] = `Bearer ${authContextRef.user.access_token}`;
