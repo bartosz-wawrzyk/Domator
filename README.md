@@ -8,7 +8,7 @@ Built with **FastAPI**, **React + Vite**, and **PostgreSQL**, it leverages JWT-b
 - [Technologies](#technologies)
 - [Features](#features)
 - [Architecture & Best Practices](#architecture--best-practices)
-- [Household Finances](#household-finances)
+- [Screenshots](#screenshots)
 - [Quick Start](#quick-start)
   - [Local](#local)
   - [Docker](#docker)
@@ -76,10 +76,6 @@ Domator centralizes household management, meal planning, and finances with a ful
 - **Financial Insights** – monthly summaries, trend analysis, and spending breakdowns  
 - **Secure API** – all finance endpoints protected with JWT; role-ready permissions  
 
-### Planned Features
-- **Notification System** – push/email reminders for meal plans, loans, and vehicle services  
-- **Advanced Financial Analytics** – predictive insights, budget recommendations, and reporting  
-
 ## Architecture & Best Practices
 
 Domator is built with a clear, maintainable architecture following modern full-stack principles:
@@ -114,6 +110,128 @@ Domator is built with a clear, maintainable architecture following modern full-s
 - **Data Layer:** ORM models, persistence logic  
 
 Authentication is stateless, JWT-based, with separate access and refresh tokens.
+
+## Screenshots
+
+### Dashboard
+![Dashboard overview](docs/screenshots/dashboard.png)
+
+### Meal Planner
+![Weekly meal plan](docs/screenshots/meal_planner.png)
+
+### Financial Overview
+![Finance import](docs/screenshots/finance_import.png)
+
+## Quick Start
+
+Domator can be run locally for development or fully containerized with Docker for a production-like environment. Follow the instructions below to get started quickly.
+
+### Local
+
+**Backend Setup:**
+
+```bash
+cd backend
+python -m venv .venv
+source .venv/bin/activate  # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+uvicorn app.main:app --reload
+```
+
+* Backend will be available at: http://localhost:8000
+* API documentation (OpenAPI / Swagger) available at: http://localhost:8000/docs
+
+**Frontend Setup:**
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+* Frontend will be available at: http://localhost:5173
+* Ensure .env variable VITE_API_URL points to your local backend (default: http://localhost:8000)
+
+### Docker
+
+Domator provides fully containerized environments for development and production using Docker Compose.
+
+#### Development Environment:
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+```
+* Includes backend, frontend, and PostgreSQL containers
+* Changes in backend/frontend code will automatically reload (hot reload)
+
+#### Production Environment:
+```bash
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+* Runs all containers in detached mode
+* Optimized images for performance and minimal footprint
+
+#### Stopping Containers:
+```bash
+docker-compose down
+```
+
+#### Viewing Logs:
+```bash
+docker-compose logs -f backend
+docker-compose logs -f frontend
+```
+Logs help debugging issues in local or production environment
+
+## Testing & Quality Assurance
+
+Domator is built with maintainability, reliability, and correctness in mind. The project includes comprehensive testing for both backend and frontend to ensure stable releases.
+
+### Backend Testing
+
+- **Unit Tests** – validate individual functions, services, and repositories using **Pytest**.  
+- **Integration Tests** – test interactions between API endpoints, services, and the database with **HTTPX async client**.  
+- **Database Testing** – uses async DB sessions to verify correct persistence, constraints, and data types (e.g., Decimal for finances).  
+- **Security & Ownership** – tests ensure users can only access and modify their own resources.  
+
+#### Run all backend tests:
+
+```bash
+cd backend
+python -m pytest
+```
+
+#### Run specific test modules:
+
+```bash
+pytest tests/test_api/test_auth.py           # Authentication
+pytest tests/test_api/test_loan.py           # Loan management CRUD & ownership
+pytest tests/test_api/test_payment.py        # Payment processing & history logic
+pytest tests/test_api/test_loan_payment_integration.py  # Cross-module financial calculations
+```
+
+#### Debugging Tests: use -s for detailed output:
+
+```bash
+pytest tests/test_api/test_loan_payment_integration.py -s
+```
+
+### Frontend Testing
+* Component Testing – verify React components render correctly and handle state changes.
+* Integration with API – ensure frontend correctly interacts with backend endpoints, including JWT-protected APIs.
+* Form Validation & UX – automated tests for forms, input validation, and error handling.
+
+#### Run frontend tests (if configured):
+
+```bash
+cd frontend
+npm run test
+```
+
+### Quality Assurance Practices
+* Type Safety – Python type hints and React TypeScript/PropTypes where applicable.
+* Code Reviews & Linting – ensure consistent style and maintainable code.
+* Dockerized Test Environments – tests run inside containers to replicate production settings.
+* Continuous Integration Ready – structure and scripts allow integration with CI pipelines (GitHub Actions, GitLab CI, etc.).
+* These measures ensure Domator remains robust, maintainable, and secure as new features are added.
 
 ## Environment Variables
 
