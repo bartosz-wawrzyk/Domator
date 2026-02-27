@@ -3,7 +3,7 @@ from datetime import datetime
 from decimal import Decimal
 from typing import List, Optional
 from pydantic import BaseModel, ConfigDict
-from sqlalchemy import String, DateTime, func, ForeignKey, Numeric, UniqueConstraint
+from sqlalchemy import String, DateTime, func, ForeignKey, Numeric, UniqueConstraint, case
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
@@ -40,6 +40,18 @@ class ImportRuleRead(BaseModel):
     category_id: uuid.UUID
     keyword: str
     model_config = ConfigDict(from_attributes=True)
+
+class TransactionRead(BaseModel):
+    id: uuid.UUID
+    date: datetime
+    amount: Decimal
+    title: str
+    category_id: Optional[uuid.UUID]
+    category: Optional[CategoryRead] = None 
+    model_config = ConfigDict(from_attributes=True)
+
+class TransactionCategoryUpdate(BaseModel):
+    category_id: uuid.UUID
 
 class Account(Base):
     __tablename__ = "accounts"
@@ -89,3 +101,5 @@ class Transaction(Base):
     title: Mapped[str] = mapped_column(String(500), nullable=False)
     raw_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    category: Mapped[Optional["Category"]] = relationship("Category")

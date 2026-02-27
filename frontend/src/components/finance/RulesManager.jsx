@@ -90,6 +90,28 @@ function RulesManager() {
         }
     };
 
+    const handleApplyRule = async (ruleId) => {
+        if (!window.confirm("Czy na pewno chcesz przeskanować historię i przypisać tę kategorię do pasujących transakcji?")) return;
+
+        const res = await financeApi.applyRule(ruleId);
+        if (res.ok) {
+            const match = res.data.message.match(/\d+/);
+            const count = match ? match[0] : "0";
+
+            let userMessage = `Sukces! Zaktualizowano ${count} transakcji.`;
+            
+            if (count === "0") {
+                userMessage = "Przeskanowano historię, ale nie znaleziono nowych transakcji pasujących do tej reguły.";
+            } else if (count === "1") {
+                userMessage = "Sukces! Zaktualizowano 1 transakcję.";
+            }
+
+            alert(userMessage);
+        } else {
+            alert(res.data?.detail || "Wystąpił błąd podczas stosowania reguły.");
+        }
+    };
+
     const handleDeleteRule = async (id) => {
         if (!window.confirm("Usunąć tę regułę?")) return;
 
@@ -219,6 +241,14 @@ function RulesManager() {
                                         <span className="badge-cat">{categories.find(c => c.id === rule.category_id)?.name || 'Brak'}</span>
                                     </div>
                                     <div className="action-btns">
+                                        <button 
+                                            className="nav-tab-btn" 
+                                            style={{ padding: '5px 12px', fontSize: '0.7rem', background: 'rgba(66, 230, 149, 0.15)', color: '#42e695' }}
+                                            onClick={() => handleApplyRule(rule.id)}
+                                            title="To narzędzie przeszuka wszystkie dotychczasowe transakcje na tym koncie i automatycznie przypisze im kategorię, jeśli pasują do słowa kluczowego."
+                                        >
+                                            ⚡ Zastosuj teraz
+                                        </button>
                                         <button className="nav-tab-btn" onClick={() => { setEditingRuleId(rule.id); setRuleFormData({keyword: rule.keyword, category_id: rule.category_id}); }}>✎</button>
                                         <button className="nav-tab-btn del-btn" onClick={() => handleDeleteRule(rule.id)}>🗑️</button>
                                     </div>

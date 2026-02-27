@@ -85,3 +85,28 @@ export function confirmImport(accountId, transactionsList) {
 export function getMonthlyStats(accountId, month, year) {
   return request(`/finance/stats/monthly/${accountId}?month=${month}&year=${year}`);
 }
+
+export function getYearlyStats(accountId, year) {
+  return request(`/finance/stats/yearly/${accountId}?year=${year}`);
+}
+
+export function getTransactions(accountId, month, year) {
+  return request(`/finance/transactions/${accountId}?month=${month}&year=${year}`);
+}
+
+export function updateTransactionCategory(transactionId, categoryId) {
+  return request(`/finance/transactions/${transactionId}/category`, {
+    method: 'PATCH',
+    body: JSON.stringify({ category_id: categoryId }),
+  });
+}
+
+export function applyRule(ruleId) {
+  return request(`/finance/rules/${ruleId}/apply`, {
+    method: 'POST',
+  });
+}
+
+export const getAvailableYears = async (accountId) => {
+    return await request(`/finance/accounts/${accountId}/available-years`);
+};

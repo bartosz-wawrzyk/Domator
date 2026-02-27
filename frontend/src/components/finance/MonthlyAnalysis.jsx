@@ -8,11 +8,12 @@ function MonthlyAnalysis({ initialAccountId }) {
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth() + 1);
   const [year, setYear] = useState(now.getFullYear());
+  
+  const [availableYears, setAvailableYears] = useState([now.getFullYear()]);
 
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(false);
 
-  const years = [2024, 2025, 2026];
   const months = [
     { v: 1, n: 'Styczeń' }, { v: 2, n: 'Luty' }, { v: 3, n: 'Marzec' },
     { v: 4, n: 'Kwiecień' }, { v: 5, n: 'Maj' }, { v: 6, n: 'Czerwiec' },
@@ -27,7 +28,24 @@ function MonthlyAnalysis({ initialAccountId }) {
   }, []);
 
   useEffect(() => {
-    if (!selectedId) return;
+    if (selectedId) {
+      const fetchYears = async () => {
+        const res = await financeApi.getAvailableYears(selectedId);
+        if (res.ok && res.data.years) {
+          const yearsFromDb = res.data.years;
+          setAvailableYears(yearsFromDb);
+
+          if (!yearsFromDb.includes(year)) {
+            setYear(yearsFromDb[0]);
+          }
+        }
+      };
+      fetchYears();
+    }
+  }, [selectedId]);
+
+  useEffect(() => {
+    if (!selectedId || !month || !year) return;
 
     const loadAnalysis = async () => {
       setLoading(true);
@@ -48,7 +66,7 @@ function MonthlyAnalysis({ initialAccountId }) {
         <h3 style={{ margin: 0, marginRight: 'auto' }}>📊 Analiza Finansowa</h3>
         
         <select 
-          className="finance-select" style={{ width: 'auto' }}
+          className="finance-select" style={{ width: 'auto', minWidth: '200px'  }}
           value={selectedId} onChange={(e) => setSelectedId(e.target.value)}
         >
           <option value="">Wybierz konto...</option>
@@ -56,23 +74,26 @@ function MonthlyAnalysis({ initialAccountId }) {
         </select>
 
         <select 
-          className="finance-select" style={{ width: 'auto' }}
-          value={month} onChange={(e) => setMonth(parseInt(e.target.value))}
+          className="finance-select" style={{ width: 'auto', minWidth: '100px' }}
+          value={year} onChange={(e) => setYear(parseInt(e.target.value))}
+          disabled={!selectedId}
         >
-          {months.map(m => <option key={m.v} value={m.v}>{m.n}</option>)}
+          {availableYears.map(y => <option key={y} value={y}>{y}</option>)}
         </select>
 
         <select 
           className="finance-select" style={{ width: 'auto' }}
-          value={year} onChange={(e) => setYear(parseInt(e.target.value))}
+          value={month} onChange={(e) => setMonth(parseInt(e.target.value))}
+          disabled={!selectedId}
         >
-          {years.map(y => <option key={y} value={y}>{y}</option>)}
+          {months.map(m => <option key={m.v} value={m.v}>{m.n}</option>)}
         </select>
       </div>
 
       {!selectedId ? (
-        <div className="analysis-card" style={{ textAlign: 'center', padding: '40px' }}>
-          <p style={{ opacity: 0.5 }}>Wybierz konto, aby zobaczyć statystyki dla {months.find(m => m.v === month).n} {year}.</p>
+        <div className="analysis-card" style={{ textAlign: 'center', padding: '60px' }}>
+          <div style={{ fontSize: '3rem', marginBottom: '20px' }}>🏦</div>
+          <p style={{ opacity: 0.6, fontSize: '1.1rem' }}>Wybierz konto bankowe z listy powyżej,<br/>a następnie wskaż interesujący Cię rok i miesiąc,<br/>aby zobaczyć podsumowanie miesiąca.</p>
         </div>
       ) : loading ? (
         <p>Ładowanie danych...</p>
@@ -80,7 +101,7 @@ function MonthlyAnalysis({ initialAccountId }) {
         <>
           <div className="stats-grid" style={{ marginBottom: '30px' }}>
             <div className="stat-box">
-              <small>Przychody ({months.find(m => m.v === month).n})</small>
+              <small>Przychody ({months.find(m => m.v === month)?.n})</small>
               <span className="stat-value val-income">+{data.summary.income.toFixed(2)} PLN</span>
             </div>
             <div className="stat-box" style={{ borderTopColor: '#ff5050' }}>

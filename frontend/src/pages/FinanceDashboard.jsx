@@ -3,6 +3,8 @@ import AccountManager from '../components/finance/AccountManager';
 import ImportManager from '../components/finance/ImportManager';
 import RulesManager from '../components/finance/RulesManager';
 import MonthlyAnalysis from '../components/finance/MonthlyAnalysis';
+import YearlyAnalysis from '../components/finance/YearlyAnalysis'; 
+import TransactionHistory from '../components/finance/TransactionHistory';
 import * as financeApi from '../api/finance';
 import '../assets/styles/finance.css';
 
@@ -58,7 +60,19 @@ function FinanceDashboard() {
           className={`nav-tab-btn ${activeTab === 'analysis' ? 'active' : ''}`}
           onClick={() => setActiveTab('analysis')}
         >
-          📈 Analiza
+          📈 Analiza miesięczna
+        </button>
+        <button 
+          className={`nav-tab-btn ${activeTab === 'yearly' ? 'active' : ''}`}
+          onClick={() => setActiveTab('yearly')}
+        >
+          📅 Analiza roczna
+        </button>
+        <button 
+          className={`nav-tab-btn ${activeTab === 'history' ? 'active' : ''}`}
+          onClick={() => setActiveTab('history')}
+        >
+          📜 Historia transakcji
         </button>
       </div>
 
@@ -86,6 +100,13 @@ function FinanceDashboard() {
             accounts={accounts}
             initialAccountId={selectedAccountId} 
           />
+        )}
+
+        {activeTab === 'yearly' && (
+          <YearlyAnalysis initialAccountId={selectedAccountId} />
+        )}
+        {activeTab === 'history' && (
+          <TransactionHistory initialAccountId={selectedAccountId} />
         )}
       </div>
     </div>

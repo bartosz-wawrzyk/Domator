@@ -45,15 +45,33 @@ function ImportManager() {
   const handleConfirm = async () => {
     setLoading(true);
     const res = await financeApi.confirmImport(selectedAcc, previewData);
+
     if (res.ok) {
-      setMessage({ type: 'success', text: `Pomyślnie zaimportowano ${previewData.length} transakcji!` });
+      setMessage({ 
+        type: 'success', 
+        text: `Pomyślnie zaimportowano ${previewData.length} transakcji!` 
+      });
       setPreviewData([]);
       setFile(null);
-      document.querySelector('input[type="file"]').value = '';
+      if (document.querySelector('input[type="file"]')) {
+        document.querySelector('input[type="file"]').value = '';
+      }
     } else {
-      const errorDetail = res.data?.detail || 'Błąd podczas zapisywania importu.';
-      setMessage({ type: 'error', text: errorDetail });
+      const errorDetail = res.data?.detail || '';
+      
+      if (errorDetail.includes('possible duplicates')) {
+        setMessage({ 
+          type: 'error', 
+          text: 'Te dane zostały już wcześniej zaimportowane lub zawierają duplikaty.' 
+        });
+      } else {
+        setMessage({ 
+          type: 'error', 
+          text: 'Wystąpił błąd podczas zapisywania importu. Spróbuj ponownie później.' 
+        });
+      }
     }
+    
     setLoading(false);
   };
 
