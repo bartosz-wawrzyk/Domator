@@ -114,7 +114,7 @@ function AccountManager({
                 </div>
             </form>
 
-            <div className="data-table">
+            <div className="data-table account-table">
                 <div className="data-row data-header">
                     <div>Nazwa konta</div>
                     <div>Typ banku</div>

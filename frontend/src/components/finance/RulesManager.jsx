@@ -14,6 +14,8 @@ function RulesManager() {
     const [editingRuleId, setEditingRuleId] = useState(null);
     const [editingCatId, setEditingCatId] = useState(null);
 
+    const [filterCategoryId, setFilterCategoryId] = useState('');
+
     useEffect(() => {
         const init = async () => {
             const [resAcc, resCats] = await Promise.all([
@@ -41,87 +43,57 @@ function RulesManager() {
         setLoading(false);
     };
 
+    const filteredRules = filterCategoryId 
+        ? rules.filter(r => String(r.category_id) === String(filterCategoryId))
+        : rules;
+
+    const selectedCategoryName = categories.find(c => String(c.id) === String(filterCategoryId))?.name;
+
     const handleSaveCategory = async (e) => {
         e.preventDefault();
         if (!newCategoryName.trim()) return;
-
         const res = editingCatId 
             ? await financeApi.updateCategory(editingCatId, { name: newCategoryName })
             : await financeApi.createCategory({ name: newCategoryName });
-
         if (res.ok) {
-            setNewCategoryName('');
-            setEditingCatId(null);
+            setNewCategoryName(''); setEditingCatId(null);
             const resCats = await financeApi.getCategories();
             if (resCats.ok) setCategories(resCats.data);
-        } else {
-            alert(res.data?.detail || "Błąd podczas zapisywania kategorii.");
         }
     };
 
     const handleDeleteCategory = async (id) => {
-        if (!window.confirm("Czy na pewno chcesz usunąć tę kategorię? System sprawdzi czy nie jest używana.")) return;
-
+        if (!window.confirm("Usunąć kategorię?")) return;
         const res = await financeApi.deleteCategory(id);
         if (res.ok) {
             const resCats = await financeApi.getCategories();
             if (resCats.ok) setCategories(resCats.data);
-        } else {
-            const msg = res.data?.detail || "Nie udało się usunąć kategorii.";
-            alert(`Błąd: ${msg}`);
         }
     };
 
     const handleRuleSubmit = async (e) => {
         e.preventDefault();
-        if (!ruleFormData.keyword || !ruleFormData.category_id) return;
-
         const payload = { ...ruleFormData, account_id: selectedAccountId };
         const res = editingRuleId 
             ? await financeApi.updateRule(editingRuleId, payload)
             : await financeApi.createRule(payload);
-
         if (res.ok) {
             setRuleFormData({ keyword: '', category_id: '' });
             setEditingRuleId(null);
             loadRules();
-        } else {
-            alert(res.data?.detail || "Błąd podczas zapisywania reguły.");
         }
     };
 
     const handleApplyRule = async (ruleId) => {
-        if (!window.confirm("Czy na pewno chcesz przeskanować historię i przypisać tę kategorię do pasujących transakcji?")) return;
-
+        if (!window.confirm("Przeskanować historię?")) return;
         const res = await financeApi.applyRule(ruleId);
-        if (res.ok) {
-            const match = res.data.message.match(/\d+/);
-            const count = match ? match[0] : "0";
-
-            let userMessage = `Sukces! Zaktualizowano ${count} transakcji.`;
-            
-            if (count === "0") {
-                userMessage = "Przeskanowano historię, ale nie znaleziono nowych transakcji pasujących do tej reguły.";
-            } else if (count === "1") {
-                userMessage = "Sukces! Zaktualizowano 1 transakcję.";
-            }
-
-            alert(userMessage);
-        } else {
-            alert(res.data?.detail || "Wystąpił błąd podczas stosowania reguły.");
-        }
+        if (res.ok) alert("Zastosowano regułę!");
     };
 
     const handleDeleteRule = async (id) => {
-        if (!window.confirm("Usunąć tę regułę?")) return;
-
+        if (!window.confirm("Usunąć regułę?")) return;
         const res = await financeApi.deleteRule(id);
-        if (res.ok) {
-            loadRules();
-        } else {
-            const msg = res.data?.detail || "Nie udało się usunąć reguły.";
-            alert(`Błąd: ${msg}`);
-        }
+        if (res.ok) loadRules();
     };
 
     const isLocked = !selectedAccountId;
@@ -142,119 +114,83 @@ function RulesManager() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1.5fr', gap: '25px', alignItems: 'start' }}>
                 
                 <div className={`finance-card ${isLocked ? 'locked-opacity' : ''}`}>
-                    <div className="card-header">
-                        <h4>📂 Kategorie</h4>
-                    </div>
-                    
+                    <h4>📂 Kategorie</h4>
                     <form onSubmit={handleSaveCategory} className="mini-form">
-                        <input 
-                            className="finance-input" placeholder="Nazwa kategorii..." 
-                            value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)}
-                            disabled={isLocked}
-                        />
-                        <button className="btn-submit-finance" disabled={isLocked}>
-                            {editingCatId ? 'Zapisz' : 'Dodaj'}
-                        </button>
-                        {editingCatId && (
-                            <button 
-                                type="button" 
-                                className="nav-tab-btn" 
-                                style={{ color: '#ff5252', fontWeight: 'bold', border: '1px solid #ff5252' }}
-                                onClick={() => { setEditingCatId(null); setNewCategoryName(''); }}
-                            >
-                                Anuluj
-                            </button>
-                        )}
+                        <input className="finance-input" placeholder="Nazwa..." value={newCategoryName} onChange={e => setNewCategoryName(e.target.value)} disabled={isLocked} />
+                        <button className="btn-submit-finance" disabled={isLocked}>{editingCatId ? 'OK' : '+'}</button>
                     </form>
-
-                    <div className="data-table">
-                        <div className="data-row data-header">
-                            <div>Nazwa kategorii</div>
-                            <div style={{ textAlign: 'right' }}>Akcje</div>
-                        </div>
-                        {isLocked ? (
-                            <p className="empty-msg">Wybierz konto, aby zobaczyć kategorie.</p>
-                        ) : categories.length === 0 ? (
-                            <p className="empty-msg">Brak kategorii.</p>
-                        ) : (
-                            categories.map(cat => (
+                    <div className="preview-container" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                        <div className="data-table">
+                            {categories.map(cat => (
                                 <div key={cat.id} className="data-row">
-                                    <div style={{ fontWeight: '500' }}>{cat.name}</div>
+                                    <div>{cat.name}</div>
                                     <div className="action-btns">
                                         <button className="nav-tab-btn" onClick={() => { setEditingCatId(cat.id); setNewCategoryName(cat.name); }}>✎</button>
                                         <button className="nav-tab-btn del-btn" onClick={() => handleDeleteCategory(cat.id)}>🗑️</button>
                                     </div>
                                 </div>
-                            ))
-                        )}
+                            ))}
+                        </div>
                     </div>
                 </div>
 
                 <div className={`finance-card ${isLocked ? 'locked-opacity' : ''}`}>
-                    <div className="card-header">
-                        <h4>🔗 Reguły Automatyzacji</h4>
-                    </div>
+                    <h4>🔗 Reguły Automatyzacji</h4>
 
-                    <form onSubmit={handleRuleSubmit} className="mini-form-grid">
-                        <input 
-                            className="finance-input" placeholder="Słowo kluczowe..." 
-                            value={ruleFormData.keyword} onChange={e => setRuleFormData({...ruleFormData, keyword: e.target.value})}
-                            disabled={isLocked} required
-                        />
-                        <select 
-                            className="finance-select" value={ruleFormData.category_id}
-                            onChange={e => setRuleFormData({...ruleFormData, category_id: e.target.value})}
-                            disabled={isLocked} required
-                        >
+                    <form onSubmit={handleRuleSubmit} className="mini-form-grid" style={{ marginBottom: '20px' }}>
+                        <input className="finance-input" placeholder="Słowo kluczowe..." value={ruleFormData.keyword} onChange={e => setRuleFormData({...ruleFormData, keyword: e.target.value})} required />
+                        <select className="finance-select" value={ruleFormData.category_id} onChange={e => setRuleFormData({...ruleFormData, category_id: e.target.value})} required>
                             <option value="">Wybierz kategorię...</option>
                             {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
-                        <button className="btn-submit-finance" disabled={isLocked}>
-                            {editingRuleId ? 'Zapisz' : 'Dodaj'}
-                        </button>
-                        {editingRuleId && (
-                            <button 
-                                type="button" 
-                                className="nav-tab-btn" 
-                                style={{ color: '#ff5252', fontWeight: 'bold', border: '1px solid #ff5252' }}
-                                onClick={() => { setEditingRuleId(null); setRuleFormData({ keyword: '', category_id: '' }); }}
-                            >
-                                Anuluj
-                            </button>
-                        )}
+                        <button className="btn-submit-finance">{editingRuleId ? 'Zapisz' : 'Dodaj'}</button>
                     </form>
 
-                    <div className="data-table">
-                        <div className="data-row data-header">
-                            <div>Słowo / Kategoria</div>
-                            <div style={{ textAlign: 'right' }}>Akcje</div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', padding: '15px 0', borderTop: '1px solid rgba(255,255,255,0.1)' }}>
+                        <span style={{ fontSize: '0.85rem', fontWeight: 'bold', color: '#aaa' }}>Filtruj listę:</span>
+                        <select 
+                            className="finance-select" 
+                            style={{ width: 'auto', minWidth: '200px', fontSize: '0.9rem', height: '42px', background: filterCategoryId ? 'rgba(37, 117, 252, 0.15)' : '' }}
+                            value={filterCategoryId}
+                            onChange={(e) => setFilterCategoryId(e.target.value)}
+                        >
+                            <option value="">Wszystkie kategorie</option>
+                            {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                        </select>
+                    </div>
+
+                    {filterCategoryId && (
+                        <div style={{ background: 'rgba(37, 117, 252, 0.1)', padding: '12px', borderRadius: '8px', marginBottom: '15px', fontSize: '0.85rem', borderLeft: '4px solid #2575fc', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                            <span>Widok: <strong>{selectedCategoryName}</strong> ({filteredRules.length})</span>
+                            <button onClick={() => setFilterCategoryId('')} style={{ background: '#ff5050', border: 'none', color: 'white', cursor: 'pointer', fontSize: '0.7rem', padding: '4px 8px', borderRadius: '4px', fontWeight: 'bold' }}>WYCZYŚĆ FILTR</button>
                         </div>
-                        {isLocked ? (
-                            <p className="empty-msg">Wybierz konto, aby zobaczyć reguły.</p>
-                        ) : rules.length === 0 ? (
-                            <p className="empty-msg">Brak reguł.</p>
-                        ) : (
-                            rules.map(rule => (
-                                <div key={rule.id} className="data-row">
-                                    <div>
-                                        <span className="rule-tag" style={{ marginRight: '10px' }}>{rule.keyword}</span>
-                                        <span className="badge-cat">{categories.find(c => c.id === rule.category_id)?.name || 'Brak'}</span>
+                    )}
+
+                    <div className="preview-container" style={{ maxHeight: '400px', overflowY: 'auto' }}>
+                        <div className="data-table">
+                            <div className="data-row data-header" style={{ position: 'sticky', top: 0, background: '#1e1e24', zIndex: 1 }}>
+                                <div>Słowo / Kategoria</div>
+                                <div style={{ textAlign: 'right' }}>Akcje</div>
+                            </div>
+                            
+                            {filteredRules.length === 0 ? (
+                                <p className="empty-msg" style={{ padding: '20px', textAlign: 'center' }}>Brak reguł dla wybranych kryteriów.</p>
+                            ) : (
+                                filteredRules.map(rule => (
+                                    <div key={rule.id} className="data-row">
+                                        <div>
+                                            <span className="rule-tag" style={{ marginRight: '10px' }}>{rule.keyword}</span>
+                                            <span className="badge-cat">{categories.find(c => String(c.id) === String(rule.category_id))?.name || 'Brak'}</span>
+                                        </div>
+                                        <div className="action-btns">
+                                            <button className="nav-tab-btn" onClick={() => handleApplyRule(rule.id)}>⚡</button>
+                                            <button className="nav-tab-btn" onClick={() => { setEditingRuleId(rule.id); setRuleFormData({keyword: rule.keyword, category_id: rule.category_id}); }}>✎</button>
+                                            <button className="nav-tab-btn del-btn" onClick={() => handleDeleteRule(rule.id)}>🗑️</button>
+                                        </div>
                                     </div>
-                                    <div className="action-btns">
-                                        <button 
-                                            className="nav-tab-btn" 
-                                            style={{ padding: '5px 12px', fontSize: '0.7rem', background: 'rgba(66, 230, 149, 0.15)', color: '#42e695' }}
-                                            onClick={() => handleApplyRule(rule.id)}
-                                            title="To narzędzie przeszuka wszystkie dotychczasowe transakcje na tym koncie i automatycznie przypisze im kategorię, jeśli pasują do słowa kluczowego."
-                                        >
-                                            ⚡ Zastosuj teraz
-                                        </button>
-                                        <button className="nav-tab-btn" onClick={() => { setEditingRuleId(rule.id); setRuleFormData({keyword: rule.keyword, category_id: rule.category_id}); }}>✎</button>
-                                        <button className="nav-tab-btn del-btn" onClick={() => handleDeleteRule(rule.id)}>🗑️</button>
-                                    </div>
-                                </div>
-                            ))
-                        )}
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
