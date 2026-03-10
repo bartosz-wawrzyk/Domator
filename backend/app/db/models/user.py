@@ -34,6 +34,19 @@ class UserPublic(BaseModel):
 
     model_config = ConfigDict(from_attributes=True)
 
+class UserChangePassword(BaseModel):
+    old_password: str
+    new_password: str = Field(min_length=8)
+    
+class UserAccountDetails(UserPublic):
+    is_active: bool
+    is_verified: bool
+    created_at: datetime
+    updated_at: datetime
+    last_login_at: datetime | None = None
+
+    model_config = ConfigDict(from_attributes=True)
+
 class User(Base):
     __tablename__ = "users"
     __table_args__ = {"schema": "dmt"}

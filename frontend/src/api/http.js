@@ -32,14 +32,15 @@ async function request(endpoint, options = {}) {
       authContextRef &&
       !endpoint.startsWith('/auth/login') &&
       !endpoint.startsWith('/auth/register') &&
-      !endpoint.startsWith('/auth/refresh')
+      !endpoint.startsWith('/auth/refresh') &&
+      !endpoint.startsWith('/auth/logout') 
     ) {
       const newToken = await authContextRef.refresh();
 
       if (newToken) {
         headers['Authorization'] = `Bearer ${newToken}`;
         const retryResponse = await fetch(`${API_URL}${endpoint}`, { ...options, headers });
-        
+
         let retryData = null;
         try {
           retryData = await retryResponse.json();
@@ -49,7 +50,7 @@ async function request(endpoint, options = {}) {
 
         return { ok: retryResponse.ok, status: retryResponse.status, data: retryData };
       }
-      
+
       return { ok: false, status: 401, data: { detail: 'Sesja wygasła. Zaloguj się ponownie.' } };
     }
 

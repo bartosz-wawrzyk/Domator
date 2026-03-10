@@ -1,21 +1,19 @@
 import { useState, useContext, useEffect } from 'react';
-import DashboardLayout from '../layouts/DashboardLayout';
-import LoanDashboard from '../pages/LoanDashboard';
-import VehiclesDashboard from '../pages/VehiclesDashboard';
-import FinanceDashboard from '../pages/FinanceDashboard';
-import PlanerDashboard from '../pages/PlanerDashboard';
-import { AuthContext } from '../context/AuthContext';
+import DashboardLayout    from '../layouts/DashboardLayout';
+import LoanDashboard      from '../pages/LoanDashboard';
+import VehiclesDashboard  from '../pages/VehiclesDashboard';
+import FinanceDashboard   from '../pages/FinanceDashboard';
+import PlanerDashboard    from '../pages/PlanerDashboard';
+import ProfileDashboard   from '../pages/ProfileDashboard';
+import { AuthContext }    from '../context/AuthContext';
 import '../assets/styles/dashboard.css';
 
 function Dashboard() {
-  const [activeMenu, setActiveMenu] = useState('');
+  const [activeMenu,      setActiveMenu]      = useState('');
   const [activeKredytTab, setActiveKredytTab] = useState('dodajKredyt');
-
   const { logout } = useContext(AuthContext);
 
-  const handleLogout = () => {
-    logout();
-  };
+  const handleLogout = () => logout();
 
   useEffect(() => {
     document.title = 'Domator – Strona główna';
@@ -23,8 +21,8 @@ function Dashboard() {
 
   const renderContent = () => {
     switch (activeMenu) {
-      case 'pojazdy': return <VehiclesDashboard />;
-      case 'finanse': return <FinanceDashboard />;
+      case 'pojazdy':  return <VehiclesDashboard />;
+      case 'finanse':  return <FinanceDashboard />;
       case 'kredyty':
         return (
           <LoanDashboard
@@ -32,7 +30,8 @@ function Dashboard() {
             setActiveTab={setActiveKredytTab}
           />
         );
-      case 'planer': return <PlanerDashboard />;
+      case 'planer':   return <PlanerDashboard />;
+      case 'profile':  return <ProfileDashboard onLogout={handleLogout} />;
       default:
         return (
           <div className="welcome-screen">

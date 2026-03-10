@@ -1,34 +1,26 @@
-import React, { useState, useRef, useEffect } from 'react';
-import Logo from '../components/Logo';
+import { useState, useEffect } from 'react';
+import Logo    from '../components/Logo';
+import UserMenu from '../components/profile/UserMenu';
+import * as userApi from '../api/user';
 import '../assets/styles/dashboard.css';
 
 const menuConfig = [
   { id: 'pojazdy', label: 'Pojazdy' },
   { id: 'finanse', label: 'Finanse' },
   { id: 'kredyty', label: 'Kredyty' },
-  { id: 'planer', label: 'Planer posiłków' },
-];
-
-const profileOptions = [
-  { id: 'myProfile', label: 'Mój profil' },
-  { id: 'settings', label: 'Ustawienia' },
-  { id: 'logout', label: 'Wyloguj' },
+  { id: 'planer',  label: 'Planer posiłków' },
 ];
 
 function DashboardLayout({ children, onLogout, onMenuSelect, activeMenu }) {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [profileOpen, setProfileOpen] = useState(false);
-  const profileRef = useRef(null);
+  const [menuOpen,  setMenuOpen]  = useState(false);
+  const [userLogin, setUserLogin] = useState(null);
 
   useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (profileRef.current && !profileRef.current.contains(e.target)) {
-        setProfileOpen(false);
-      }
+    const fetchUser = async () => {
+      const res = await userApi.getMe();
+      if (res.ok) setUserLogin(res.data.login);
     };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    fetchUser();
   }, []);
 
   const handleLogoClick = () => {
@@ -39,13 +31,6 @@ function DashboardLayout({ children, onLogout, onMenuSelect, activeMenu }) {
   const handleMenuClick = (id) => {
     onMenuSelect?.(id);
     setMenuOpen(false);
-  };
-
-  const handleProfileOption = (id) => {
-    if (id === 'logout') {
-      onLogout();
-    }
-    setProfileOpen(false);
   };
 
   return (
@@ -71,27 +56,11 @@ function DashboardLayout({ children, onLogout, onMenuSelect, activeMenu }) {
         </div>
 
         <div className="header-right">
-          <div className="profile-menu" ref={profileRef}>
-            <div
-              className="menu-item"
-              onClick={() => setProfileOpen((prev) => !prev)}
-            >
-              Profil
-            </div>
-
-            {profileOpen && (
-              <div className="submenu">
-                {profileOptions.map((opt) => (
-                  <div
-                    key={opt.id}
-                    onClick={() => handleProfileOption(opt.id)}
-                  >
-                    {opt.label}
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
+          <UserMenu
+            userLogin={userLogin}
+            onProfile={() => handleMenuClick('profile')}
+            onLogout={onLogout}
+          />
 
           <div
             className="hamburger-btn"

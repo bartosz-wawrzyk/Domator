@@ -51,3 +51,24 @@ class UserRepository:
             await db.execute(
                 delete(RefreshToken).where(RefreshToken.id.in_(ids_to_delete))
             )
+
+    @staticmethod
+    async def update_password(
+        session: AsyncSession,
+        user: User,
+        new_password_hash: str
+    ) -> User:
+        user.password_hash = new_password_hash
+        await session.commit()
+        await session.refresh(user)
+        return user
+        
+    @staticmethod
+    async def deactivate_user(
+        session: AsyncSession,
+        user: User
+    ) -> User:
+        user.is_active = False
+        await session.commit()
+        await session.refresh(user)
+        return user
