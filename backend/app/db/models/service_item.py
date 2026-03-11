@@ -40,6 +40,19 @@ class ServiceItem(Base):
 
     event: Mapped["ServiceEvent"] = relationship("ServiceEvent", back_populates="items")
 
+class ServiceItemRead(BaseModel):
+    id: uuid.UUID
+    service_event_id: uuid.UUID
+    type: str
+    description: str
+    cost: Decimal
+    is_recurring: bool
+    interval_km: Optional[int]
+    interval_months: Optional[int]
+    created_at: datetime
+    
+    model_config = ConfigDict(from_attributes=True)
+    
 class ServiceItemCreate(BaseModel):
     service_event_id: uuid.UUID
     type: str

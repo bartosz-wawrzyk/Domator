@@ -1,11 +1,12 @@
 import uuid
+from typing import List
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func, delete
 from sqlalchemy.orm import selectinload
 from app.db.deps import get_db, get_current_user
-from app.db.models.service_event import ServiceEvent, ServiceEventCreate, ServiceEventUpdate
-from app.db.models.service_item import ServiceItem, ServiceItemCreate
+from app.db.models.service_event import ServiceEvent, ServiceEventCreate, ServiceEventUpdate, ServiceEventRead
+from app.db.models.service_item import ServiceItem, ServiceItemCreate, ServiceItemUpdate, ServiceItemRead
 from app.db.models.vehicle import Vehicle
 from app.db.repositories.service import ServiceRepository
 
@@ -24,6 +25,15 @@ async def create_service_event(
     if not vehicle:
         raise HTTPException(status_code=404, detail="Vehicle not found")
 
+    if data.mileage_at_service < vehicle.current_mileage:
+        raise HTTPException(
+            status_code=400, 
+            detail=f"Mileage at service cannot be lower than current vehicle mileage ({vehicle.current_mileage})"
+        )
+
+    if data.mileage_at_service > vehicle.current_mileage:
+        vehicle.current_mileage = data.mileage_at_service
+
     new_event = ServiceEvent(
         vehicle_id=data.vehicle_id,
         service_date=data.service_date,
@@ -33,36 +43,11 @@ async def create_service_event(
     )
     
     event = await ServiceRepository.create_event(db, new_event)
-    return {"message": "Service event created", "event_id": event.id}
+    await db.commit() 
 
-@router.post("/items", status_code=status.HTTP_201_CREATED)
-async def add_service_item(
-    data: ServiceItemCreate,
-    db: AsyncSession = Depends(get_db),
-    current_user = Depends(get_current_user),
-):
-    event_res = await db.execute(
-        select(ServiceEvent).join(Vehicle, Vehicle.id == ServiceEvent.vehicle_id)
-        .where(ServiceEvent.id == data.service_event_id, Vehicle.user_id == current_user.id)
-    )
-    event = event_res.scalar_one_or_none()
-    if not event:
-        raise HTTPException(status_code=404, detail="Service event not found")
+    return {"message": "Service event created and vehicle mileage updated", "event_id": event.id}
 
-    new_item = ServiceItem(**data.model_dump())
-    db.add(new_item)
-    
-    await db.flush()
-    
-    cost_res = await db.execute(
-        select(func.sum(ServiceItem.cost)).where(ServiceItem.service_event_id == event.id)
-    )
-    event.total_cost = cost_res.scalar() or 0
-    
-    await db.commit()
-    return {"message": "Service item added and total cost updated"}
-
-@router.get("/vehicle/{vehicle_id}")
+@router.get("/vehicle/{vehicle_id}", response_model=List[ServiceEventRead])
 async def get_vehicle_history(
     vehicle_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
@@ -126,7 +111,34 @@ async def delete_service_event(
     await ServiceRepository.sync_vehicle_cache(db, vehicle_id)
     
     return {"message": "Service event and items deleted, vehicle cache updated"}
+
+@router.post("/items", status_code=status.HTTP_201_CREATED)
+async def add_service_item(
+    data: ServiceItemCreate,
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    event_res = await db.execute(
+        select(ServiceEvent).join(Vehicle, Vehicle.id == ServiceEvent.vehicle_id)
+        .where(ServiceEvent.id == data.service_event_id, Vehicle.user_id == current_user.id)
+    )
+    event = event_res.scalar_one_or_none()
+    if not event:
+        raise HTTPException(status_code=404, detail="Service event not found")
+
+    new_item = ServiceItem(**data.model_dump())
+    db.add(new_item)
     
+    await db.flush()
+    
+    cost_res = await db.execute(
+        select(func.sum(ServiceItem.cost)).where(ServiceItem.service_event_id == event.id)
+    )
+    event.total_cost = cost_res.scalar() or 0
+    
+    await db.commit()
+    return {"message": "Service item added", "item_id": new_item.id} 
+
 @router.delete("/items/{item_id}")
 async def delete_service_item(
     item_id: uuid.UUID,
@@ -164,3 +176,42 @@ async def delete_service_item(
     await ServiceRepository.sync_vehicle_cache(db, vehicle_id)
     
     return {"message": "Item deleted and total cost updated"}
+
+@router.patch("/items/{item_id}")
+async def update_service_item(
+    item_id: uuid.UUID,
+    data: ServiceItemUpdate,
+    db: AsyncSession = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    result = await db.execute(
+        select(ServiceItem)
+        .join(ServiceEvent, ServiceEvent.id == ServiceItem.service_event_id)
+        .join(Vehicle, Vehicle.id == ServiceEvent.vehicle_id)
+        .where(ServiceItem.id == item_id, Vehicle.user_id == current_user.id)
+    )
+    item = result.scalar_one_or_none()
+
+    if not item:
+        raise HTTPException(status_code=404, detail="Service item not found")
+
+    update_data = data.model_dump(exclude_unset=True)
+    for key, value in update_data.items():
+        setattr(item, key, value)
+
+    await db.flush()
+
+    event_id = item.service_event_id
+    cost_res = await db.execute(
+        select(func.sum(ServiceItem.cost))
+        .where(ServiceItem.service_event_id == event_id)
+    )
+    event_res = await db.execute(
+        select(ServiceEvent).where(ServiceEvent.id == event_id)
+    )
+    event = event_res.scalar_one()
+    event.total_cost = cost_res.scalar() or 0
+
+    await db.commit()
+
+    return {"message": "Service item updated and total cost recalculated"}

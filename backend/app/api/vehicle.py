@@ -1,7 +1,7 @@
 import uuid
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-from datetime import datetime
+from datetime import datetime, timezone
 
 from app.db.deps import get_db, get_current_user
 from app.db.repositories.vehicle import VehicleRepository
@@ -27,8 +27,8 @@ async def create_vehicle(
         last_service_date=data.last_service_date,
         last_service_mileage=data.last_service_mileage,
         is_active=True,
-        created_at=datetime.utcnow(),
-        updated_at=datetime.utcnow(),
+        created_at=datetime.now(timezone.utc),
+        updated_at=datetime.now(timezone.utc),
     )
 
     vehicle = await VehicleRepository.create(db, vehicle)

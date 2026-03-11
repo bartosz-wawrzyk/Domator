@@ -3,11 +3,12 @@ from datetime import datetime
 from typing import Optional, List, TYPE_CHECKING
 from decimal import Decimal
 
-from sqlalchemy import DateTime, Integer, Text, Numeric, func
+from sqlalchemy import DateTime, Integer, Text, Numeric, func, ForeignKey
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from pydantic import BaseModel, Field, ConfigDict
 from app.db.base import Base
+from app.db.models.service_item import ServiceItemRead
 
 if TYPE_CHECKING:
     from app.db.models.service_item import ServiceItem
@@ -17,7 +18,7 @@ class ServiceEvent(Base):
     __table_args__ = {"schema": "dmt"}
 
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    vehicle_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False, index=True)
+    vehicle_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), ForeignKey("dmt.vehicles.id", ondelete="CASCADE"), nullable=False, index=True)
     service_date: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     mileage_at_service: Mapped[int] = mapped_column(Integer, nullable=False)
     total_cost: Mapped[Decimal | None] = mapped_column(Numeric(10, 2), nullable=True, default=0)
@@ -42,6 +43,19 @@ class ServiceEvent(Base):
         lazy="raise"
     )
 
+class ServiceEventRead(BaseModel):
+    id: uuid.UUID
+    vehicle_id: uuid.UUID
+    service_date: datetime
+    mileage_at_service: int
+    total_cost: Decimal
+    notes: Optional[str]
+    created_at: datetime
+    updated_at: datetime
+    items: List[ServiceItemRead] = []
+
+    model_config = ConfigDict(from_attributes=True)
+    
 class ServiceEventCreate(BaseModel):
     vehicle_id: uuid.UUID
     service_date: datetime
