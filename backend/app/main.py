@@ -6,6 +6,9 @@ from app.api.auth import router as auth_router
 from app.api.loan import router as loan_router
 from app.api.payment import router as payment_router
 from app.api.vehicle import router as vehicle_router
+from app.api.fuel import router as fuel_router
+from app.api.insurance import router as insurance_router
+from app.api.inspection import router as inspection_router
 from app.api.services import router as services_router
 from app.api.meal import router as meal_router
 from app.api.meal_planner import router as meal_planner_router
@@ -47,6 +50,9 @@ app.include_router(auth_router)
 app.include_router(loan_router)
 app.include_router(payment_router)
 app.include_router(vehicle_router)
+app.include_router(fuel_router)
+app.include_router(insurance_router)
+app.include_router(inspection_router)
 app.include_router(services_router)
 app.include_router(meal_router)
 app.include_router(meal_planner_router)

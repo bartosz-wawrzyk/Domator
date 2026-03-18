@@ -1,6 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import VehicleForm    from '../components/vehicle/VehicleForm';
 import ServiceHistory from '../components/vehicle/ServiceHistory';
+import InsuranceHistory from '../components/vehicle/InsuranceHistory';
+import FuelHistory        from '../components/vehicle/FuelHistory';
+import InspectionHistory  from '../components/vehicle/InspectionHistory';
 import * as vehicleApi from '../api/vehicle';
 import '../assets/styles/vehicle.css';
 
@@ -14,8 +17,11 @@ const FUEL_LABEL = {
 };
 
 const TABS = [
-  { id: 'list',    label: '🚗 Pojazdy' },
-  { id: 'service', label: '🔧 Historia serwisowa' },
+  { id: 'list',        label: '🚗 Pojazdy' },
+  { id: 'service',     label: '🔧 Historia serwisowa' },
+  { id: 'insurance',   label: '🛡️ Polisy OC/AC' },
+  { id: 'inspections', label: '🔍 Badania techniczne' },
+  { id: 'fuel',        label: '⛽ Tankowania' },
 ];
 
 function VehiclesDashboard() {
@@ -86,6 +92,24 @@ function VehiclesDashboard() {
     setSelectedVehicle(vehicle);
     setFormMode('edit');
     setActiveTab('list');
+  };
+
+  const handleSelectForInsurance = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setActiveTab('insurance');
+    setFormMode(null);
+  };
+
+  const handleSelectForFuel = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setActiveTab('fuel');
+    setFormMode(null);
+  };
+
+  const handleSelectForInspections = (vehicle) => {
+    setSelectedVehicle(vehicle);
+    setActiveTab('inspections');
+    setFormMode(null);
   };
 
   const formatMileage = (val) =>
@@ -206,6 +230,27 @@ function VehiclesDashboard() {
                       </button>
                       <button
                         className="vehicle-btn-icon"
+                        onClick={() => handleSelectForInsurance(v)}
+                        title="Polisy ubezpieczeniowe"
+                      >
+                        🛡️ Polisy
+                      </button>
+                      <button
+                        className="vehicle-btn-icon"
+                        onClick={() => handleSelectForInspections(v)}
+                        title="Badania techniczne"
+                      >
+                        🔍 Badania
+                      </button>
+                      <button
+                        className="vehicle-btn-icon"
+                        onClick={() => handleSelectForFuel(v)}
+                        title="Historia tankowań"
+                      >
+                        ⛽ Paliwo
+                      </button>
+                      <button
+                        className="vehicle-btn-icon"
                         onClick={() => handleEditVehicle(v)}
                         title="Edytuj pojazd"
                       >
@@ -269,6 +314,150 @@ function VehiclesDashboard() {
                   ← Zmień pojazd
                 </button>
                 <ServiceHistory vehicle={selectedVehicle} />
+              </>
+            )}
+          </>
+        )}
+
+        {activeTab === 'insurance' && (
+          <>
+            {!selectedVehicle ? (
+              <>
+                <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '16px', fontSize: '0.88rem' }}>
+                  Wybierz pojazd aby zobaczyć polisy:
+                </p>
+                <div className="vehicle-list">
+                  {vehicles.map((v) => (
+                    <div
+                      key={v.id}
+                      className="vehicle-card"
+                      onClick={() => setSelectedVehicle(v)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="vehicle-card-icon">
+                        {v.fuel_type === 'ELECTRIC' ? '⚡' : '🚗'}
+                      </div>
+                      <div className="vehicle-card-info">
+                        <div className="vehicle-card-title">{v.brand} {v.model}</div>
+                        <div className="vehicle-card-meta">
+                          <span className="vehicle-meta-item">
+                            🔢 <strong>{v.registration_number}</strong>
+                          </span>
+                          <span className="vehicle-meta-item">
+                            📍 <strong>{formatMileage(v.current_mileage)}</strong>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  className="vehicle-btn-secondary"
+                  style={{ marginBottom: '20px' }}
+                  onClick={() => setSelectedVehicle(null)}
+                >
+                  ← Zmień pojazd
+                </button>
+                <InsuranceHistory vehicle={selectedVehicle} />
+              </>
+            )}
+          </>
+        )}
+
+        {activeTab === 'fuel' && (
+          <>
+            {!selectedVehicle ? (
+              <>
+                <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '16px', fontSize: '0.88rem' }}>
+                  Wybierz pojazd aby zobaczyć historię tankowań:
+                </p>
+                <div className="vehicle-list">
+                  {vehicles.map((v) => (
+                    <div
+                      key={v.id}
+                      className="vehicle-card"
+                      onClick={() => setSelectedVehicle(v)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="vehicle-card-icon">
+                        {v.fuel_type === 'ELECTRIC' ? '⚡' : '🚗'}
+                      </div>
+                      <div className="vehicle-card-info">
+                        <div className="vehicle-card-title">{v.brand} {v.model}</div>
+                        <div className="vehicle-card-meta">
+                          <span className="vehicle-meta-item">
+                            🔢 <strong>{v.registration_number}</strong>
+                          </span>
+                          <span className="vehicle-meta-item">
+                            📍 <strong>{formatMileage(v.current_mileage)}</strong>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  className="vehicle-btn-secondary"
+                  style={{ marginBottom: '20px' }}
+                  onClick={() => setSelectedVehicle(null)}
+                >
+                  ← Zmień pojazd
+                </button>
+                <FuelHistory vehicle={selectedVehicle} />
+              </>
+            )}
+          </>
+        )}
+
+        {activeTab === 'inspections' && (
+          <>
+            {!selectedVehicle ? (
+              <>
+                <p style={{ color: 'rgba(255,255,255,0.5)', marginBottom: '16px', fontSize: '0.88rem' }}>
+                  Wybierz pojazd aby zobaczyć badania techniczne:
+                </p>
+                <div className="vehicle-list">
+                  {vehicles.map((v) => (
+                    <div
+                      key={v.id}
+                      className="vehicle-card"
+                      onClick={() => setSelectedVehicle(v)}
+                      style={{ cursor: 'pointer' }}
+                    >
+                      <div className="vehicle-card-icon">
+                        {v.fuel_type === 'ELECTRIC' ? '⚡' : '🚗'}
+                      </div>
+                      <div className="vehicle-card-info">
+                        <div className="vehicle-card-title">{v.brand} {v.model}</div>
+                        <div className="vehicle-card-meta">
+                          <span className="vehicle-meta-item">
+                            🔢 <strong>{v.registration_number}</strong>
+                          </span>
+                          <span className="vehicle-meta-item">
+                            📍 <strong>{formatMileage(v.current_mileage)}</strong>
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <>
+                <button
+                  className="vehicle-btn-secondary"
+                  style={{ marginBottom: '20px' }}
+                  onClick={() => setSelectedVehicle(null)}
+                >
+                  ← Zmień pojazd
+                </button>
+                <InspectionHistory vehicle={selectedVehicle} />
               </>
             )}
           </>

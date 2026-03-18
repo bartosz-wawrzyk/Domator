@@ -16,7 +16,6 @@ Built with **FastAPI**, **React + Vite**, and **PostgreSQL**, it leverages JWT-b
 - [Environment Variables](#environment-variables)
 - [Troubleshooting](#troubleshooting)
 - [Planned Features](#planned-features)
-- [Contribution Guidelines](#contribution-guidelines)
 
 ## Technologies
 
@@ -32,7 +31,7 @@ Built with **FastAPI**, **React + Vite**, and **PostgreSQL**, it leverages JWT-b
 ### Frontend
 - **React + Vite** – modular, fast, and maintainable frontend  
 - Component-based architecture with reusable, testable UI elements  
-- State management via React Context (or Redux if applicable)  
+- State management via React Context 
 - Form validation and error handling for robust UX  
 
 ### Authentication & Security
@@ -60,9 +59,11 @@ Domator centralizes household management, meal planning, and finances with a ful
 - **Ownership & Security** – users can only access and modify their own financial records  
 
 ### Vehicle Management
-- **Service history tracking** – log maintenance, inspections, and repairs  
-- **Insurance management** – OC insurance details and expiration reminders  
-- **Notifications** – future-ready for automated service or insurance reminders  
+- **Service history tracking** – log maintenance, inspections, and repairs with cost tracking  
+- **Insurance management** – OC/AC/OC+AC policy details, status tracking, and expiration reminders  
+- **Technical inspections** – track inspection dates, expiration, station details, and costs with automatic status indicators  
+- **Fuel logs & consumption analysis** – log refuels with price tracking and automatic average consumption calculation per fuel type  
+- **Notifications** – future-ready for automated service, insurance, and inspection reminders
 
 ### Meal Planning
 - **Weekly meal schedules** – plan meals and assign recipes  
@@ -94,7 +95,7 @@ Domator is built with a clear, maintainable architecture following modern full-s
 - **Frontend architecture**:  
   - Modular React components with Vite  
   - Full integration with backend APIs  
-  - State management with React Context (or Redux if applicable)  
+  - State management with React Context
   - Form validation and error handling for robust UX
 
 - **Quality & maintainability**:  
@@ -121,6 +122,9 @@ Authentication is stateless, JWT-based, with separate access and refresh tokens.
 
 ### Financial Overview
 ![Finance import](docs/screenshots/finance_import.png)
+
+### Vehicle Management
+![Vehicle list](docs/screenshots/vehicles.png)
 
 ## Quick Start
 
@@ -206,24 +210,15 @@ pytest tests/test_api/test_auth.py           # Authentication
 pytest tests/test_api/test_loan.py           # Loan management CRUD & ownership
 pytest tests/test_api/test_payment.py        # Payment processing & history logic
 pytest tests/test_api/test_loan_payment_integration.py  # Cross-module financial calculations
+pytest tests/test_api/test_insurance.py      # Vehicle insurance policies
+pytest tests/test_api/test_fuel.py           # Fuel logs & consumption analysis
+pytest tests/test_api/test_inspection.py     # Technical inspections
 ```
 
 #### Debugging Tests: use -s for detailed output:
 
 ```bash
 pytest tests/test_api/test_loan_payment_integration.py -s
-```
-
-### Frontend Testing
-* Component Testing – verify React components render correctly and handle state changes.
-* Integration with API – ensure frontend correctly interacts with backend endpoints, including JWT-protected APIs.
-* Form Validation & UX – automated tests for forms, input validation, and error handling.
-
-#### Run frontend tests (if configured):
-
-```bash
-cd frontend
-npm run test
 ```
 
 ### Quality Assurance Practices

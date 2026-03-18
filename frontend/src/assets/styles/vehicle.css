@@ -576,6 +576,44 @@
   background: rgba(255, 255, 255, 0.1);
 }
 
+.insurance-form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  align-items: end;
+}
+
+.vehicle-badge.future {
+  background: rgba(37, 117, 252, 0.12);
+  color: #2575fc;
+  border: 1px solid rgba(37, 117, 252, 0.25);
+}
+
+.fuel-consumption-box {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.fuel-consumption-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.fuel-avg-value {
+  font-size: 1.8rem;
+  font-weight: 800;
+  color: #42e695;
+  margin-bottom: 12px;
+}
+
+.fuel-consumption-history {
+  margin-top: 8px;
+}
+
 @media (max-width: 768px) {
   .vehicle-card {
     grid-template-columns: auto 1fr;
@@ -590,4 +628,5 @@
   .service-item-row {
     grid-template-columns: 1fr 1fr auto;
   }
+  .insurance-form-grid { grid-template-columns: 1fr; }
 }
