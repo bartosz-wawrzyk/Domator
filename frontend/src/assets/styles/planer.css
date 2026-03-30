@@ -9,35 +9,33 @@
 .sub-nav {
   display: flex;
   gap: 10px;
-  flex-wrap: wrap;
-  padding: 10px;
-  background: rgba(255, 255, 255, 0.03);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 15px;
+  background: transparent;
+  border-radius: 0;
 }
 
 .sub-nav-btn {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: rgba(255, 255, 255, 0.7);
   padding: 10px 20px;
-  border-radius: 8px;
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.6);
   cursor: pointer;
   font-weight: 600;
-  transition: all 0.2s ease;
-  font-size: 14px;
+  transition: all 0.3s ease;
+  border-radius: 8px;
+  font-size: 0.9rem;
 }
 
 .sub-nav-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
   color: #fff;
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .sub-nav-btn.active {
-  background: linear-gradient(135deg, #6a11cb, #2575fc);
-  color: white;
-  border: none;
-  box-shadow: 0 4px 15px rgba(37, 117, 252, 0.3);
+  color: #fff;
+  background: rgba(37, 117, 252, 0.15);
+  box-shadow: inset 0 -2px 0 #2575fc;
 }
 
 .planer-content {
@@ -80,18 +78,19 @@
 .planer-form input, 
 .planer-form select, 
 .planer-form textarea {
-  padding: 12px;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(0, 0, 0, 0.2);
-  color: white;
-  outline: none;
-  transition: border-color 0.2s;
+    background: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 8px;
+    font-family: inherit;
 }
 
 .planer-form input:focus,
 .planer-form textarea:focus {
-  border-color: #2575fc;
+border-color: #2575fc;
+    outline: none;
+    background: rgba(0, 0, 0, 0.3);
 }
 
 .planer-form select {
@@ -131,18 +130,66 @@
   transform: translateY(-2px);
 }
 
-.meal-cancel-btn {
-  background: rgba(255, 0, 0, 0.7);
-  color: white;
-  padding: 6px 12px;
-  border-radius: 6px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: filter 0.2s;
+.product-manager-section {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px;
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-.meal-cancel-btn:hover {
-  filter: brightness(1.2);
+.meal-category-tag {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    color: rgba(255, 255, 255, 0.6);
+}
+
+.meal-error-message {
+    background: rgba(255, 68, 68, 0.1);
+    color: #ff4444;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    border-left: 4px solid #ff4444;
+}
+
+.meal-action-btn-wide {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.85rem;
+    text-align: left;
+    transition: all 0.2s;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.meal-action-btn-wide:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.3);
+}
+
+.meal-action-btn-wide.btn-danger {
+    color: #ff6b6b;
+    border-color: rgba(255, 107, 107, 0.2);
+}
+
+.meal-action-btn-wide.btn-danger:hover {
+    background: rgba(255, 107, 107, 0.15);
+    border-color: #ff6b6b;
+}
+
+.meal-cell-actions {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 5px;
 }
 
 .meal-list {
@@ -156,7 +203,7 @@
 
 .meal-row {
   display: grid;
-  grid-template-columns: 2fr 3fr 100px;
+  grid-template-columns: 2fr 3fr 1fr;
   align-items: center;
   padding: 12px 16px;
   color: white;
@@ -182,22 +229,91 @@
   flex-direction: column;
 }
 
-.meal-cell-actions {
+.meal-card-actions {
   display: flex;
+  flex-direction: column;
   gap: 8px;
-  justify-content: flex-end;
+  flex-shrink: 0;
 }
 
-.meal-cell-actions button {
-  background: none;
+.meal-btn-primary {
+  background: linear-gradient(135deg, #42e695, #3bb2b8);
+  color: #000;
+  font-weight: 700;
+  padding: 11px 22px;
   border: none;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 18px;
-  color: white;
+  font-size: 0.88rem;
+  transition: transform 0.2s, filter 0.2s;
+  font-family: inherit;
 }
 
-.meal-cell-actions button:hover {
-  filter: brightness(1.2);
+.meal-btn-primary:hover {
+  transform: translateY(-2px);
+  filter: brightness(1.1);
+}
+
+.meal-btn-primary:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+}
+
+.meal-btn-secondary {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 600;
+  padding: 11px 22px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.meal-btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.meal-btn-danger {
+  background: rgba(255, 82, 82, 0.1);
+  color: #ff5252;
+  border: 1px solid rgba(255, 82, 82, 0.25);
+  font-weight: 600;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.meal-btn-danger:hover {
+  background: rgba(255, 82, 82, 0.2);
+}
+
+.meal-btn-icon {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.65);
+  padding: 8px 14px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.82rem;
+  transition: all 0.2s;
+  font-family: inherit;
+  font-weight: 600;
+}
+
+.meal-btn-icon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.meal-btn-block {
+  width: 100%;
 }
 
 @media (max-width: 600px) {
@@ -325,7 +441,7 @@
   font-size: 0.7rem;
   opacity: 0.8;
   display: flex;
-  justify-content: space-between;
+  justify-content: left;
 }
 
 .modal-header {
@@ -363,20 +479,6 @@
   color: white;
   font-size: 0.9rem;
   cursor: pointer;
-}
-
-.meal-delete-btn {
-  background: #ff444422;
-  color: #ff4444;
-  border: 1px solid #ff4444;
-  padding: 5px 12px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.meal-delete-btn:hover {
-  background: #ff4444;
-  color: white;
 }
 
 .generate-week-btn {

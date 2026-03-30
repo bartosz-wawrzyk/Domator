@@ -12,6 +12,8 @@
   gap: 10px;
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   padding-bottom: 15px;
+  background: transparent;
+  border-radius: 0;
 }
 
 .vehicles-nav-btn {
@@ -23,7 +25,6 @@
   font-weight: 600;
   transition: all 0.3s ease;
   border-radius: 8px;
-  font-family: inherit;
   font-size: 0.9rem;
 }
 
@@ -34,7 +35,8 @@
 
 .vehicles-nav-btn.active {
   color: #fff;
-  background: linear-gradient(135deg, #2575fc, #6a11cb);
+  background: rgba(37, 117, 252, 0.15);
+  box-shadow: inset 0 -2px 0 #2575fc;
 }
 
 .vehicles-content {

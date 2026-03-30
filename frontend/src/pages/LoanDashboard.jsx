@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react';
-import LoanManager from '../components/loans/LoanManager';
+import LoanManager from '../components/loan/LoanManager';
 import '../assets/styles/loan.css';
+
+const TABS = [
+  { id: 'loans', label: '💰 Moje kredyty' },
+];
 
 function LoanDashboard() {
   const [activeTab, setActiveTab] = useState('loans');
@@ -9,29 +13,25 @@ function LoanDashboard() {
     document.title = 'Domator – Kredyty i pożyczki';
   }, []);
 
-  const renderTabContent = () => {
-    switch (activeTab) {
-      case 'loans':
-        return <LoanManager />;
-      default:
-        return null;
-    }
-  };
-
   return (
-    <div className="loan-container">
-      <div className="sub-nav">
-        <button 
-          className={`sub-nav-btn ${activeTab === 'loans' ? 'active' : ''}`}
-          onClick={() => setActiveTab('loans')}
-        >
-          💰 Moje kredyty
-        </button>
+    <div className="loans-container">
+
+      <div className="loans-nav">
+        {TABS.map((tab) => (
+          <button
+            key={tab.id}
+            className={`loans-nav-btn ${activeTab === tab.id ? 'active' : ''}`}
+            onClick={() => setActiveTab(tab.id)}
+          >
+            {tab.label}
+          </button>
+        ))}
       </div>
 
-      <div className="loan-content">
-        {renderTabContent()}
+      <div className="loans-content">
+        {activeTab === 'loans' && <LoanManager />}
       </div>
+
     </div>
   );
 }

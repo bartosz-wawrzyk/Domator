@@ -16,26 +16,19 @@ function PlanerDashboard() {
 
   const renderTabContent = () => {
     switch (activeTab) {
-      case 'harmonogram':
-        return <MealPlannerManager />;
-      case 'produkty':
-        return (
+      case 'harmonogram': return <MealPlannerManager />;
+      case 'produkty': return (
           <div className="planer-products-split">
             <ProductManager type="proteins" />
             <div style={{ margin: '40px 0', borderBottom: '1px solid rgba(255,255,255,0.1)' }}></div>
             <ProductManager type="bases" />
           </div>
         );
-      case 'dania':
-        return <MealManager />;
-      case 'analiza':
-        return <MealAnalysis />;
-      case 'skladniki':
-        return <MealIngredientManager />;
-      case 'ustawienia':
-        return <MealSettingsManager />;
-      default:
-        return null;
+      case 'dania': return <MealManager />;
+      case 'analiza': return <MealAnalysis />;
+      case 'skladniki': return <MealIngredientManager />;
+      case 'ustawienia': return <MealSettingsManager />;
+      default: return null;
     }
   };
 
@@ -46,37 +39,37 @@ function PlanerDashboard() {
           className={`sub-nav-btn ${activeTab === 'harmonogram' ? 'active' : ''}`}
           onClick={() => setActiveTab('harmonogram')}
         >
-          Harmonogram
+          📅 Harmonogram
         </button>
         <button 
           className={`sub-nav-btn ${activeTab === 'produkty' ? 'active' : ''}`}
           onClick={() => setActiveTab('produkty')}
         >
-          Bazy / Proteiny
+          🥩 Bazy / Proteiny
         </button>
         <button 
           className={`sub-nav-btn ${activeTab === 'dania' ? 'active' : ''}`}
           onClick={() => setActiveTab('dania')}
         >
-          Dania
+          🍲 Dania
         </button>
         <button 
           className={`sub-nav-btn ${activeTab === 'analiza' ? 'active' : ''}`}
           onClick={() => setActiveTab('analiza')}
         >
-          Analiza
+          📊 Analiza
         </button>
         <button 
           className={`sub-nav-btn ${activeTab === 'skladniki' ? 'active' : ''}`}
           onClick={() => setActiveTab('skladniki')}
         >
-          Składniki
+          🛒 Składniki
         </button>
         <button 
           className={`sub-nav-btn ${activeTab === 'ustawienia' ? 'active' : ''}`}
           onClick={() => setActiveTab('ustawienia')}
         >
-          Konfiguracja
+          ⚙️ Ustawienia
         </button>
       </div>
 

@@ -29,7 +29,9 @@ function MealPlannerManager() {
       ]);
       setMonthData(plan.days || []);
       setSimpleMeals(meals);
-    } catch (err) { console.error(err); }
+    } catch (err) { 
+      console.error(err); 
+    }
   };
 
   useEffect(() => { loadData(); }, [currentDate]);
@@ -133,13 +135,13 @@ function MealPlannerManager() {
       const dayEntry = monthData.find(d => d.date === dateStr);
       
       cells.push(
-        <div key={day} className="calendar-day" onClick={() => openDayDetails(dateStr)}>
-          <div className="day-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+        <div key={day} className={`calendar-day ${dayEntry ? 'has-meal' : ''}`} onClick={() => openDayDetails(dateStr)}>
+          <div className="day-header">
             <span className="day-number">{day}</span>
             {isMonday && (
-              <div style={{ display: 'flex', flexDirection: 'row', gap: '4px', alignItems: 'flex-end' }}>
-                <button className="generate-week-btn" onClick={(e) => handleGenerateClick(e, dateStr)}>🪄 Generuj</button>
-                <button className="delete-week-badge" onClick={(e) => handleDeleteWeek(e, dateStr)}>🗑️ Czyść</button>
+              <div className="day-actions-mini">
+                <button className="generate-week-btn" onClick={(e) => handleGenerateClick(e, dateStr)} title="Generuj tydzień">🪄</button>
+                <button className="delete-week-badge" onClick={(e) => handleDeleteWeek(e, dateStr)} title="Czyść tydzień">🗑️</button>
               </div>
             )}
           </div>
@@ -148,7 +150,12 @@ function MealPlannerManager() {
               <span className="meal-name">
                 {dayEntry.meal_name || (dayEntry.is_out_of_home ? "🍽️ Poza domem" : "Brak nazwy")}
               </span>
-              {dayEntry.meal_name && <small>{dayEntry.protein_type} / {dayEntry.base_type}</small>}
+              {dayEntry.meal_name && (
+                <div className="meal-info">
+                  <span>{dayEntry.protein_type}</span>
+                  <span>{dayEntry.base_type}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
@@ -159,45 +166,64 @@ function MealPlannerManager() {
 
   return (
     <div className="tab-pane">
-      <div className="calendar-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
+      <div className="modal-header">
         <h3>🗓️ Harmonogram Posiłków</h3>
-        <div className="calendar-nav" style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-          <button className="sub-nav-btn" onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}>&lt;</button>
-          <span className="current-month" style={{ color: 'white', fontWeight: 'bold', fontSize: '1.2rem', minWidth: '150px', textAlign: 'center' }}>
+        <div className="calendar-nav">
+          <button className="sub-nav-btn" onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() - 1, 1))}>◀</button>
+          <span className="current-month-display">
             {new Intl.DateTimeFormat('pl-PL', { month: 'long', year: 'numeric' }).format(currentDate)}
           </span>
-          <button className="sub-nav-btn" onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}>&gt;</button>
+          <button className="sub-nav-btn" onClick={() => setCurrentDate(new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 1))}>▶</button>
         </div>
       </div>
 
       <div className="calendar-grid">
-        {['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Ndz'].map(d => <div key={d} className="weekday-label">{d}</div>)}
+        {['Pon', 'Wt', 'Śr', 'Czw', 'Pt', 'Sob', 'Ndz'].map(d => (
+          <div key={d} className="weekday-label">{d}</div>
+        ))}
         {renderCalendar()}
       </div>
 
       {showForm && (
         <div className="modal-overlay" onClick={() => setShowForm(false)}>
-          <div className="planer-content modal-content" onClick={e => e.stopPropagation()}>
+          <div className="planer-content modal-content" onClick={e => e.stopPropagation()} style={{ maxWidth: '500px' }}>
             <div className="modal-header">
-              <h4 style={{ margin: 0 }}>Dzień: {selectedDate}</h4>
+              <h4 style={{ margin: 0 }}>Plan: {selectedDate}</h4>
               {dayDetails && <button type="button" className="meal-delete-btn" onClick={handleDeleteDay}>Usuń plan</button>}
             </div>
+            
             <form onSubmit={handleAddMeal} className="planer-form">
-              <select value={formData.meal_id || ''} onChange={e => setFormData({...formData, meal_id: e.target.value})}>
-                <option value="">-- wybierz danie --</option>
-                {simpleMeals.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-              </select>
-              <textarea placeholder="Notatka" value={formData.note} onChange={e => setFormData({...formData, note: e.target.value})} />
+              <div className="planer-form-row">
+                <select 
+                   value={formData.meal_id || ''} 
+                   onChange={e => setFormData({...formData, meal_id: e.target.value})}
+                   disabled={formData.is_out_of_home}
+                >
+                  <option value="">-- wybierz danie --</option>
+                  {simpleMeals.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                </select>
+              </div>
+
+              <textarea 
+                placeholder="Notatka (np. przygotować rano...)" 
+                value={formData.note} 
+                onChange={e => setFormData({...formData, note: e.target.value})}
+                rows="2"
+              />
+
               <div className="checkbox-row">
                 <label className="custom-checkbox">
-                  <input type="checkbox" checked={formData.is_two_days} onChange={e => setFormData({...formData, is_two_days: e.target.checked})}/> Na 2 dni
+                  <input type="checkbox" checked={formData.is_two_days} onChange={e => setFormData({...formData, is_two_days: e.target.checked})}/>
+                  🥘 Na 2 dni
                 </label>
                 <label className="custom-checkbox">
-                  <input type="checkbox" checked={formData.is_out_of_home} onChange={e => setFormData({...formData, is_out_of_home: e.target.checked})}/> Poza domem
+                  <input type="checkbox" checked={formData.is_out_of_home} onChange={e => setFormData({...formData, is_out_of_home: e.target.checked})}/>
+                  🍽️ Poza domem
                 </label>
               </div>
-              <div className="planer-form-row">
-                <button type="submit" className="planer-btn-submit">Zaplanuj</button>
+
+              <div className="planer-form-row" style={{ marginTop: '10px' }}>
+                <button type="submit" className="planer-btn-submit">Zatwierdź</button>
                 <button type="button" className="meal-cancel-btn" onClick={() => setShowForm(false)}>Anuluj</button>
               </div>
             </form>
@@ -207,51 +233,62 @@ function MealPlannerManager() {
 
       {showProposalModal && proposal && (
         <div className="modal-overlay" onClick={() => setShowProposalModal(false)}>
-          <div className="planer-content modal-content proposal-modal" onClick={e => e.stopPropagation()}>
+          <div className="planer-content modal-content proposal-modal" onClick={e => e.stopPropagation()} style={{ maxWidth: '850px' }}>
             <div className="modal-header">
-              <h3>🪄 Propozycja na tydzień</h3>
+              <h3>🪄 Propozycja automatyczna</h3>
               <button className="meal-cancel-btn" onClick={() => setShowProposalModal(false)}>Zamknij</button>
             </div>
             
-            <div className="proposal-list" style={{ marginTop: '15px' }}>
+            <div className="meal-list" style={{ marginTop: '20px', maxHeight: '60vh', overflowY: 'auto' }}>
               {proposal.map((item, index) => (
-                <div key={index} className="proposal-item" style={{ display: 'flex', gap: '10px', alignItems: 'center', marginBottom: '10px' }}>
-                  <div className="proposal-date" style={{ minWidth: '100px', fontWeight: 'bold' }}>{item.meal_date}</div>
+                <div key={index} className="meal-row">
+                  <div className="meal-cell" style={{ flex: '0 0 110px' }}>
+                    <strong>{item.meal_date}</strong>
+                  </div>
                   
-                  <div className="planer-form" style={{ flex: 1, padding: 0, background: 'none', border: 'none', margin: 0 }}>
-                    <select 
-                      value={item.meal_id || ''} 
-                      onChange={(e) => updateProposalItem(index, 'meal_id', e.target.value)}
-                    >
-                      <option value="">-- wybierz danie --</option>
-                      {simpleMeals.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
-                    </select>
+                  <div className="meal-cell">
+                    <div className="planer-form" style={{ padding: 0, background: 'none', border: 'none', margin: 0 }}>
+                      <select 
+                        value={item.meal_id || ''} 
+                        onChange={(e) => updateProposalItem(index, 'meal_id', e.target.value)}
+                        style={{ padding: '6px' }}
+                      >
+                        <option value="">-- wybierz danie --</option>
+                        {simpleMeals.map(m => <option key={m.id} value={m.id}>{m.name}</option>)}
+                      </select>
+                    </div>
                   </div>
 
-                  <label className="custom-checkbox" style={{ whiteSpace: 'nowrap' }}>
-                    <input 
-                      type="checkbox" 
-                      checked={item.is_two_days} 
-                      onChange={(e) => updateProposalItem(index, 'is_two_days', e.target.checked)}
-                    /> 2 dni
-                  </label>
+                  <div className="meal-cell" style={{ flex: '0 0 80px' }}>
+                    <label className="custom-checkbox" style={{ fontSize: '0.8rem' }}>
+                      <input 
+                        type="checkbox" 
+                        checked={item.is_two_days} 
+                        onChange={(e) => updateProposalItem(index, 'is_two_days', e.target.checked)}
+                      /> 2 dni
+                    </label>
+                  </div>
 
-                  <button 
-                    type="button" 
-                    className="meal-delete-btn" 
-                    style={{ padding: '5px 8px' }}
-                    onClick={() => removeFromProposal(index)}
-                    title="Usuń ten dzień z propozycji"
-                  >
-                    🗑️
-                  </button>
+                  <div className="meal-cell-actions">
+                    <button 
+                      type="button" 
+                      className="meal-action-btn" 
+                      onClick={() => removeFromProposal(index)}
+                    >
+                      🗑️
+                    </button>
+                  </div>
                 </div>
               ))}
             </div>
 
-            <div className="planer-form-row" style={{ marginTop: '20px', justifyContent: 'center' }}>
-              <button className="planer-btn-submit" onClick={handleSaveProposal}>Zatwierdź Plan ({proposal.length} dni)</button>
-              <button className="sub-nav-btn" onClick={(e) => handleGenerateClick(e, proposal[0]?.meal_date || selectedDate)}>🔄 Ponów</button>
+            <div className="planer-form-row" style={{ marginTop: '25px', justifyContent: 'flex-end', gap: '10px' }}>
+              <button className="sub-nav-btn" style={{ border: '1px solid rgba(255,255,255,0.1)' }} onClick={(e) => handleGenerateClick(e, proposal[0]?.meal_date || selectedDate)}>
+                🔄 Ponów
+              </button>
+              <button className="planer-btn-submit" onClick={handleSaveProposal}>
+                💾 Zatwierdź Plan
+              </button>
             </div>
           </div>
         </div>

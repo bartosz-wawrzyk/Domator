@@ -57,14 +57,12 @@ function ProductManager({ type }) {
       resetForm();
       await loadData();
     } catch (err) {
-      console.error(err);
       setError(err.message || 'Błąd zapisu');
     }
   };
 
   const handleDelete = async (id) => {
     if (!window.confirm('Usunąć element?')) return;
-
     try {
       if (isProtein) {
         await mealsApi.deleteProtein(id);
@@ -73,20 +71,7 @@ function ProductManager({ type }) {
       }
       await loadData();
     } catch (err) {
-      console.error(err);
-      let msg = 'Błąd usuwania';
-
-      if (err?.message) msg = err.message;
-      else if (typeof err === 'string') msg = err;
-      else if (err?.detail?.[0]?.msg) msg = err.detail[0].msg;
-
-      if (msg === 'Cannot delete: Protein is used in existing meals') {
-        msg = 'Nie można usunąć: proteina jest używana w istniejących daniach';
-      } else if (msg === 'Cannot delete: Base type is used in existing meals') {
-        msg = 'Nie można usunąć: baza jest używana w istniejących daniach';
-      }
-
-      setError(msg);
+      setError(err.message || 'Błąd usuwania');
     }
   };
 
@@ -95,137 +80,65 @@ function ProductManager({ type }) {
     setFormData({ name: item.name, category: item.category });
   };
 
-  return (
-    <div className="tab-pane">
-      <h3 style={{ color: 'white', marginBottom: '20px' }}>
-        {isProtein ? '🥩' : '🍚'} {label}
-      </h3>
+return (
+    <div className="product-manager-section">
+      <div className="modal-header" style={{ marginBottom: '15px' }}>
+        <h3 style={{ margin: 0 }}>{isProtein ? '🥩' : '🍚'} {label}</h3>
+      </div>
 
-      {error && (
-        <div className="credit-message credit-error">
-          {error}
-        </div>
-      )}
+      {error && <div className="meal-error-message">{error}</div>}
 
-      <form className="credit-form" onSubmit={handleSubmit}>
-        <div className="credit-form-fields">
+      <form className="planer-form" onSubmit={handleSubmit}>
+        <div className="planer-form-row">
           <input
-            placeholder="Nazwa"
+            placeholder="Nazwa (np. Kurczak, Ryż)"
             value={formData.name}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, name: e.target.value }))
-            }
+            onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
             required
           />
           <input
             placeholder="Kategoria"
             value={formData.category}
-            onChange={(e) =>
-              setFormData((prev) => ({ ...prev, category: e.target.value }))
-            }
+            onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
             required
           />
         </div>
-
-        <div
-          style={{
-            marginTop: '10px',
-            display: 'flex',
-            gap: '10px',
-            alignItems: 'center',
-          }}
-        >
-          <button
-            type="submit"
-            className="credit-toggle-btn"
-            style={{ width: 'auto' }}
-          >
-            {editingId ? 'Zapisz zmiany' : `Dodaj ${label}`}
+        <div className="planer-form-row" style={{ marginTop: '10px', justifyContent: 'flex-start' }}>
+          <button type="submit" className="planer-btn-submit">
+            {editingId ? '💾 Zapisz zmiany' : `➕ Dodaj ${label}`}
           </button>
-
           {editingId && (
-            <button
-              type="button"
-              onClick={resetForm}
-              className="credit-cancel-btn"
-              style={{
-                background: 'rgba(255,255,255,0.1)',
-                color: 'white',
-                border: 'none',
-                padding: '10px 15px',
-                borderRadius: '8px',
-                cursor: 'pointer',
-              }}
-            >
+            <button type="button" onClick={resetForm} className="meal-cancel-btn">
               Anuluj
             </button>
           )}
         </div>
       </form>
 
-      {loading ? (
-        <div style={{ marginTop: '20px', opacity: 0.6 }}>Ładowanie danych...</div>
-      ) : (
-        <div
-          className="loan-grid-wrapper"
-          style={{ gridTemplateColumns: '1fr 1fr 100px', marginTop: '20px' }}
-        >
-          <div className="loan-row">
-            <div className="loan-cell loan-cell-header">Nazwa</div>
-            <div className="loan-cell loan-cell-header">Kategoria</div>
-            <div className="loan-cell loan-cell-header">Akcje</div>
-          </div>
-
-          {items.length > 0 ? (
-            items.map((item) => (
-              <div key={item.id} className="loan-row">
-                <div className="loan-cell">{item.name}</div>
-                <div className="loan-cell">{item.category}</div>
-                <div
-                  className="loan-cell"
-                  style={{ display: 'flex', gap: '5px' }}
-                >
-                  <button
-                    onClick={() => startEdit(item)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                    title="Edytuj"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    onClick={() => handleDelete(item.id)}
-                    style={{
-                      background: 'none',
-                      border: 'none',
-                      cursor: 'pointer',
-                    }}
-                    title="Usuń"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="loan-row">
-              <div
-                className="loan-cell"
-                style={{
-                  gridColumn: 'span 3',
-                  textAlign: 'center',
-                  opacity: 0.5,
-                }}
-              >
-                Brak elementów na liście.
-              </div>
-            </div>
-          )}
+      <div className="meal-list" style={{ marginTop: '20px' }}>
+        <div className="meal-row header" style={{ background: 'rgba(255,255,255,0.05)', fontWeight: 'bold' }}>
+          <div className="meal-cell">Nazwa</div>
+          <div className="meal-cell">Kategoria</div>
+          <div className="meal-cell-actions">Akcje</div>
         </div>
-      )}
+
+        {loading ? (
+          <div style={{ padding: '20px', opacity: 0.5 }}>Ładowanie...</div>
+        ) : items.length > 0 ? (
+          items.map((item) => (
+            <div key={item.id} className="meal-row">
+              <div className="meal-cell"><strong>{item.name}</strong></div>
+              <div className="meal-cell"><span className="meal-category-tag">{item.category}</span></div>
+                <div className="meal-card-actions">
+                  <button className="meal-btn-secondary loan-btn-block" onClick={() => startEdit(meal)}>✏️ Edytuj</button>
+                  <button className="meal-btn-danger loan-btn-block" onClick={() => handleDelete(meal.id)}>🗑️ Usuń</button>
+                </div>
+            </div>
+          ))
+        ) : (
+          <div style={{ padding: '20px', opacity: 0.5, textAlign: 'center' }}>Brak elementów na liście.</div>
+        )}
+      </div>
     </div>
   );
 }
