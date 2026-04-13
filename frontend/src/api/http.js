@@ -13,8 +13,9 @@ async function request(endpoint, options = {}) {
     headers['Content-Type'] = 'application/json';
   }
 
-  if (authContextRef?.user?.access_token) {
-    headers['Authorization'] = `Bearer ${authContextRef.user.access_token}`;
+  const token = authContextRef?.user?.access_token || localStorage.getItem('access_token');
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
   }
 
   try {

@@ -44,7 +44,7 @@ class Settings(BaseSettings):
         )
 
     model_config = SettingsConfigDict(
-        env_file=".env",  # <- tutaj tylko nazwa pliku .env w backend/
+        env_file=".env",
         case_sensitive=False
     )
 

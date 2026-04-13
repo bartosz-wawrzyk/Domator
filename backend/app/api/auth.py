@@ -188,13 +188,12 @@ async def refresh_tokens(
         message="Refreshed token",
     )
 
-@router.get("/me", response_model=UserPublic)
+@router.get("/me")
 async def get_me(current_user: User = Depends(get_current_user)):
     return current_user
 
 @router.get(
-    "/me/account", 
-    response_model=UserAccountDetails
+    "/me/account"
 )
 async def get_my_account_details(
     current_user: User = Depends(get_current_user)

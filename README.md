@@ -8,6 +8,7 @@ Built with **FastAPI**, **React + Vite**, and **PostgreSQL**, it leverages JWT-b
 - [Technologies](#technologies)
 - [Features](#features)
 - [Architecture & Best Practices](#architecture--best-practices)
+- [Database Migrations](#database-migrations)
 - [Screenshots](#screenshots)
 - [Quick Start](#quick-start)
   - [Local](#local)
@@ -111,6 +112,56 @@ Domator is built with a clear, maintainable architecture following modern full-s
 - **Data Layer:** ORM models, persistence logic  
 
 Authentication is stateless, JWT-based, with separate access and refresh tokens.
+
+## Database Migrations
+ 
+Domator uses **Alembic** for version-controlled database schema management. Migrations are tracked, reversible, and automatically applied during deployment.
+ 
+### How Migrations Work
+ 
+- **Automatic on Startup** – Docker Compose automatically runs pending migrations when containers start (`docker-compose up`)
+- **Version Control** – all schema changes are tracked in `backend/alembic/versions/` with timestamps and descriptions
+- **Rollback Support** – can revert to previous schema versions if needed
+- **Development & Production** – same migration system in both environments ensures schema consistency
+ 
+### Creating a New Migration
+ 
+When you modify models in `app/models/`, create a migration to sync the database schema:
+ 
+```bash
+cd backend
+alembic revision --autogenerate -m "descriptive message"
+```
+ 
+This generates a new migration file in `backend/alembic/versions/`. Review it before committing to version control.
+ 
+### Applying Migrations Locally
+ 
+```bash
+cd backend
+alembic upgrade head
+```
+ 
+### Reverting Migrations
+ 
+To rollback to a previous schema version:
+ 
+```bash
+cd backend
+alembic downgrade -1  # rollback one migration
+alembic downgrade <revision_id>  # rollback to specific revision
+```
+ 
+### Docker Integration
+ 
+Migrations are automatically applied during container startup via the entrypoint script. No manual intervention needed — just run:
+ 
+```bash
+docker-compose -f docker-compose.dev.yml up --build
+docker-compose -f docker-compose.prod.yml up -d --build
+```
+ 
+The database schema will be initialized and kept in sync with all pending migrations.
 
 ## Screenshots
 

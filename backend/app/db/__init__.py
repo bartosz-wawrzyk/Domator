@@ -13,3 +13,4 @@ from app.db.models.meal_planner import WeekPlan, WeekMeal
 from app.db.models.finance import Account, Category, ImportRule, Transaction
 from app.db.models.activity_log import UserActivityLog
 from app.db.models.refresh_token import RefreshToken
+from app.db.models.settings.meal_settings import MealSettings
