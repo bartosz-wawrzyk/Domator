@@ -4,16 +4,16 @@ services:
   backend:
     build: 
       context: ./backend
-    container_name: domator_backend_dev
+    container_name: domator_dev_backend
     env_file:
       - .env
     environment:
       - POSTGRES_HOST=db
+      - ENVIRONMENT=development
     ports:
       - "8000:8000"
     volumes:
       - ./backend:/app
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     depends_on:
       db:
         condition: service_healthy
@@ -22,7 +22,7 @@ services:
     build: 
       context: ./frontend
       target: development-stage
-    container_name: domator_frontend_dev
+    container_name: domator_dev_frontend
     ports:
       - "5173:5173"
     volumes:
@@ -36,7 +36,7 @@ services:
 
   db:
     image: postgres:16
-    container_name: domator_db_dev
+    container_name: domator_dev_db
     restart: always
     env_file:
       - .env

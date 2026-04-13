@@ -13,3 +13,5 @@ pydantic[email]
 
 argon2-cffi
 python-multipart
+
+alembic

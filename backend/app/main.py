@@ -16,7 +16,6 @@ from app.api.settings.meal_settings import router as meal_settings_router
 from app.api.meals_ingredients import router as meals_ingredients_router
 from app.api.meal_analysis import router as meal_analysis_router
 from app.api.finance import router as finance_router
-from app.db.init_db import init_db
 from app.services.cleanup import periodic_cleanup
 import asyncio
 
@@ -24,8 +23,6 @@ settings = get_settings()
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()
-
     cleanup_task = asyncio.create_task(periodic_cleanup())
     
     yield
