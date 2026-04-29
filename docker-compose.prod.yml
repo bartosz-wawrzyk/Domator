@@ -4,7 +4,7 @@ services:
   backend:
     build: 
       context: ./backend
-    container_name: domator_backend
+    container_name: domator_prod_backend
     restart: always
     env_file:
       - .env
@@ -20,7 +20,7 @@ services:
       context: ./frontend
       args:
         - VITE_API_URL=/api
-    container_name: domator_frontend
+    container_name: domator_prod_frontend
     restart: always
     ports:
       - "80:80"
@@ -29,7 +29,7 @@ services:
 
   db:
     image: postgres:16
-    container_name: domator_db
+    container_name: domator_prod_db
     restart: always
     env_file:
       - .env
